@@ -147,7 +147,7 @@
 
   <div class="section">
     <label>Paste Teks Bill Parlay</label>
-    <textarea id="pasteText" placeholder="Paste teks bill lu di sini... Contoh:&#10;&#10;1&#10;JAPAN EMPEROR CUP&#10;FC Machida Zelvia vs Tochigi City FC&#10;Type : Over/Under  Odds: 1.64&#10;Bet : FC Machida Zelvia Win&#10;@ 1.640&#10;&#10;Bet Amount : 104.00"></textarea>
+    <textarea id="pasteText" placeholder="Paste teks bill lu di sini... Contoh:&#10;&#10;1&#10;JAPAN EMPEROR CUP&#10;FC Machida Zelvia vs Tochigi City FC&#10;Type : Over/Under  Odds: 1.64&#10;Bet : FC Machida Zelvia Win&#10;@ 1.640&#10;&#10;Bet Amount : 322.00&#10;Odds : 5.912&#10;Est. /Payout: 1,903.66"></textarea>
     <button class="btn-primary" onclick="applyPaste()">Parse &amp; Terapkan</button>
     <div id="ocrStatus" class="ocr-status"></div>
     <div class="paste-hint">
@@ -158,11 +158,11 @@
   <div class="input-grid section">
     <div>
       <label for="saldoAwal">Saldo Awal</label>
-      <input type="number" id="saldoAwal" value="200" min="0" step="any">
+      <input type="number" id="saldoAwal" value="322" min="0" step="any">
     </div>
     <div>
       <label for="stake">Nilai Taruhan</label>
-      <input type="number" id="stake" value="200" min="0" step="any">
+      <input type="number" id="stake" value="322" min="0" step="any">
     </div>
   </div>
 
@@ -346,8 +346,6 @@
 
     if (parsed.stake) {
       document.getElementById('stake').value = parsed.stake;
-
-      // Auto-fill saldo awal — samain dengan stake
       if (parsed.saldoAwal) {
         document.getElementById('saldoAwal').value = parsed.saldoAwal;
       } else {
@@ -409,8 +407,13 @@
     }
   }
 
+  // FORMAT ANGKA: koma ribuan + titik desimal (US/International)
+  // Contoh: 1903.66 → "1,903.66" | 322 → "322.00"
   function formatNum(n) {
-    return n.toLocaleString('id-ID', { maximumFractionDigits: 2 });
+    return n.toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
   }
 
   function calculate() {
@@ -448,7 +451,7 @@
         <hr>
         <div class="row"><span>Saldo Awal</span><span>${formatNum(saldoAwal)}</span></div>
         <div class="row"><span>Taruhan (Hangus)</span><span class="status-lose">−${formatNum(stake)}</span></div>
-        <div class="row"><span>Nilai Kembali</span><span>0</span></div>
+        <div class="row"><span>Nilai Kembali</span><span>0.00</span></div>
         <div class="saldo-panel">
           <div class="saldo-label">Saldo Efektif Akhir</div>
           <div class="saldo-value lose">${formatNum(saldoAkhir)}</div>
