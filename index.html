@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mix Parlay Calculator</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #0b1220 0%, #131c30 100%);
+    color: #e5e7eb;
+    display: flex;
+    justify-content: center;
+    padding: 24px 16px;
+    min-height: 100vh;
+    margin: 0;
+  }
+  .card {
+    background: #1a2338;
+    padding: 26px 22px;
+    border-radius: 18px;
+    width: 100%;
+    max-width: 580px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.45);
+    border: 1px solid #253048;
+    height: fit-content;
+  }
+  h1 {
+    margin: 0 0 4px;
+    font-size: 22px;
+    letter-spacing: 0.3px;
+  }
+  .sub {
+    font-size: 12.5px;
+    color: #8b96ab;
+    margin-bottom: 20px;
+  }
+  label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 13px;
+    color: #9aa6bd;
+    font-weight: 500;
+  }
+  input, select {
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #2e3a55;
+    background: #0e1728;
+    color: #e5e7eb;
+    font-size: 14px;
+    outline: none;
+    transition: border 0.15s;
+    font-family: inherit;
+  }
+  input:focus, select:focus {
+    border-color: #38bdf8;
+  }
+  #stake { width: 100%; }
+  .leg {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+    align-items: center;
+  }
+  .leg input.odds { flex: 1; min-width: 0; }
+  .leg select.result-type { width: 120px; flex-shrink: 0; }
+  button {
+    cursor: pointer;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-weight: 600;
+    font-size: 13.5px;
+    transition: transform 0.08s, opacity 0.15s;
+    font-family: inherit;
+  }
+  button:active { transform: scale(0.97); }
+  .btn-primary {
+    background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+    color: #06121f;
+    width: 100%;
+    margin-top: 14px;
+    padding: 12px;
+    font-size: 15px;
+  }
+  .btn-secondary {
+    background: #2a3651;
+    color: #d1d9e8;
+    margin-top: 4px;
+    width: 100%;
+  }
+  .btn-remove {
+    background: #b91c1c;
+    color: #fff;
+    padding: 10px 12px;
+    flex-shrink: 0;
+  }
+  .result {
+    margin-top: 18px;
+    padding: 16px;
+    background: #0e1728;
+    border-radius: 12px;
+    line-height: 1.85;
+    font-size: 14.5px;
+    border: 1px solid #253048;
+  }
+  .hint {
+    font-size: 12px;
+    color: #7c88a0;
+    margin-top: 14px;
+    line-height: 1.7;
+    padding: 12px;
+    background: #131c2e;
+    border-radius: 10px;
+    border-left: 3px solid #38bdf8;
+  }
+  .hint b { color: #b8c3d9; }
+  .hint code {
+    background: #0b1220;
+    padding: 1px 5px;
+    border-radius: 4px;
+    color: #7dd3fc;
+    font-size: 11.5px;
+  }
+  .status-lose { color: #f87171; font-weight: 700; }
+  .status-win { color: #4ade80; font-weight: 700; }
+  .breakdown {
+    font-size: 12px;
+    color: #8b96ab;
+    padding: 3px 0;
+    border-bottom: 1px dashed #1e2942;
+  }
+  hr {
+    border: none;
+    border-top: 1px solid #253048;
+    margin: 12px 0;
+  }
+  .big {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+  }
+  .row { display: flex; justify-content: space-between; }
+  .row span:first-child { color: #8b96ab; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>Mix Parlay Calculator</h1>
+  <div class="sub">Hitung potensi hasil dari beberapa pilihan dalam satu taruhan berganda.</div>
+
+  <label for="stake">Nilai Taruhan</label>
+  <input type="number" id="stake" value="100000" min="0" step="any">
+
+  <div style="margin-top:18px;">
+    <label>Daftar Pilihan (Odds & Hasil)</label>
+    <div id="legs"></div>
+    <button class="btn-secondary" onclick="addLeg()">+ Tambah Pilihan</button>
+  </div>
+
+  <button class="btn-primary" onclick="calculate()">Hitung Hasil</button>
+  <div id="result" class="result">Hasil perhitungan bakal muncul di sini.</div>
+
+  <div class="hint">
+    <b>Panduan singkat:</b><br>
+    • <b>W</b> — menang penuh, odds tidak berubah<br>
+    • <b>WH</b> — menang separuh, nilai odds jadi <code>(odds − 1) ÷ 2 + 1</code><br>
+    • <b>D</b> — seri, odds dianggap <code>1</code> (tidak mempengaruhi hitungan)<br>
+    • <b>LH</b> — kalah separuh, odds dianggap <code>0.5</code><br>
+    • <b>L</b> — kalah penuh, seluruh kombinasi dianggap gugur<br><br>
+    <b>Rumus Mix Parlay:</b><br>
+    <code>(Total Odds × Nilai Taruhan) − Nilai Taruhan</code><br>
+    Hasil <b>minus</b> = sebesar itu yang lu kalah. Hasil <b>plus</b> = sebesar itu yang lu menang.
+  </div>
+</div>
+
+<script>
+  const legsContainer = document.getElementById('legs');
+
+  const TYPE_OPTIONS = [
+    { value: 'W',  label: 'W — Menang' },
+    { value: 'WH', label: 'WH — Menang ½' },
+    { value: 'D',  label: 'D — Seri' },
+    { value: 'LH', label: 'LH — Kalah ½' },
+    { value: 'L',  label: 'L — Kalah' },
+  ];
+
+  function addLeg(odds = '', type = 'W') {
+    const wrap = document.createElement('div');
+    wrap.className = 'leg';
+    wrap.innerHTML = `
+      <input type="number" class="odds" placeholder="Odds (contoh 1.85)" step="0.01" min="1" value="${odds}">
+      <select class="result-type">
+        ${TYPE_OPTIONS.map(o =>
+          `<option value="${o.value}" ${o.value === type ? 'selected' : ''}>${o.label}</option>`
+        ).join('')}
+      </select>
+      <button class="btn-remove" onclick="this.parentElement.remove()">✕</button>
+    `;
+    legsContainer.appendChild(wrap);
+  }
+
+  function convertOdds(odds, type) {
+    switch (type) {
+      case 'W':  return odds;
+      case 'D':  return 1;
+      case 'WH': return (odds - 1) / 2 + 1;
+      case 'LH': return 0.5;
+      case 'L':  return 0;
+      default:   return odds;
+    }
+  }
+
+  function formatNum(n) {
+    return n.toLocaleString('id-ID', { maximumFractionDigits: 2 });
+  }
+
+  function calculate() {
+    const stake = parseFloat(document.getElementById('stake').value) || 0;
+    const legEls = document.querySelectorAll('.leg');
+    const result = document.getElementById('result');
+
+    if (legEls.length === 0) {
+      result.innerHTML = 'Minimal harus ada 1 pilihan, bre.';
+      return;
+    }
+
+    let totalOdds = 1;
+    let valid = true;
+    let anyLose = false;
+    const breakdown = [];
+
+    legEls.forEach((el, i) => {
+      const odds = parseFloat(el.querySelector('.odds').value);
+      const type = el.querySelector('.result-type').value;
+
+      if (isNaN(odds) || odds < 1) {
+        valid = false;
+        return;
+      }
+
+      if (type === 'L') {
+        anyLose = true;
+        breakdown.push(`Pilihan ${i + 1}: odds ${odds.toFixed(2)} → L (kalah penuh)`);
+        return;
+      }
+
+      const adj = convertOdds(odds, type);
+      totalOdds *= adj;
+      breakdown.push(`Pilihan ${i + 1}: odds ${odds.toFixed(2)} → ${type} (efektif ${adj.toFixed(4)})`);
+    });
+
+    if (!valid) {
+      result.innerHTML = 'Pastikan semua odds diisi angka ≥ 1.00 ya bre.';
+      return;
+    }
+
+    if (anyLose) {
+      result.innerHTML = `
+        <div class="status-lose">Ada pilihan yang kalah penuh (L).</div>
+        <hr>
+        <div class="row"><span>Nilai Taruhan</span><span>${formatNum(stake)}</span></div>
+        <div class="row"><span>Hasil Akhir</span><span class="status-lose">−${formatNum(stake)}</span></div>
+        <div style="font-size:12px;color:#8b96ab;margin-top:8px;">
+          Seluruh kombinasi gugur, jadi taruhan dianggap hangus.
+        </div>
+      `;
+      return;
+    }
+
+    const grossReturn = stake * totalOdds;
+    const netResult = grossReturn - stake;
+    const isWin = netResult >= 0;
+
+    result.innerHTML = `
+      ${breakdown.map(b => `<div class="breakdown">${b}</div>`).join('')}
+      <hr>
+      <div class="row"><span>Total Odds</span><span class="big">${totalOdds.toFixed(4)}</span></div>
+      <div class="row"><span>Nilai Taruhan</span><span>${formatNum(stake)}</span></div>
+      <div class="row"><span>Nilai Kembali</span><span>${formatNum(grossReturn)}</span></div>
+      <hr>
+      <div class="row">
+        <span>Hasil Bersih</span>
+        <span class="${isWin ? 'status-win' : 'status-lose'} big">
+          ${isWin ? '+' : '−'}${formatNum(Math.abs(netResult))}
+        </span>
+      </div>
+      <div style="font-size:12px;color:#8b96ab;margin-top:8px;">
+        ${isWin
+          ? 'Hasil plus → lu menang sebesar angka di atas.'
+          : 'Hasil minus → lu kalah sebesar angka di atas.'}
+      </div>
+    `;
+  }
+
+  addLeg('1.85', 'W');
+  addLeg('2.10', 'W');
+</script>
+</body>
+</html>
