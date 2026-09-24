@@ -8,38 +8,23 @@
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
   :root {
-    --neon: #00e5ff;
-    --neon-2: #7c3aed;
-    --neon-3: #ff006e;
-    --gold: #ffd700;
-    --green: #00ffa3;
-    --bg-1: #05060c;
-    --panel: rgba(16, 21, 43, 0.65);
+    --neon: #00e5ff; --neon-2: #7c3aed; --neon-3: #ff006e;
+    --gold: #ffd700; --green: #00ffa3;
+    --bg-1: #05060c; --panel: rgba(16, 21, 43, 0.65);
     --border: rgba(0, 229, 255, 0.25);
-    --text: #e6f1ff;
-    --muted: #7b8ba8;
+    --text: #e6f1ff; --muted: #7b8ba8;
   }
-
   html, body { height: 100%; }
   body {
     font-family: 'Rajdhani', sans-serif;
-    background: var(--bg-1);
-    color: var(--text);
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    padding: 40px 16px;
-    min-height: 100vh;
-    overflow-x: hidden;
+    background: var(--bg-1); color: var(--text);
+    display: flex; justify-content: center; align-items: flex-start;
+    padding: 40px 16px; min-height: 100vh; overflow-x: hidden;
     position: relative;
   }
-
   body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
+    content: ''; position: fixed; inset: 0;
     background:
       radial-gradient(circle at 20% 10%, rgba(0,229,255,0.18), transparent 45%),
       radial-gradient(circle at 85% 90%, rgba(124,58,237,0.22), transparent 45%),
@@ -48,602 +33,192 @@
     z-index: -2;
   }
   body::after {
-    content: '';
-    position: fixed;
-    inset: 0;
+    content: ''; position: fixed; inset: 0;
     background-image:
       linear-gradient(rgba(0,229,255,0.05) 1px, transparent 1px),
       linear-gradient(90deg, rgba(0,229,255,0.05) 1px, transparent 1px);
-    background-size: 48px 48px;
-    z-index: -1;
+    background-size: 48px 48px; z-index: -1;
     mask-image: radial-gradient(circle at 50% 40%, black 30%, transparent 80%);
     -webkit-mask-image: radial-gradient(circle at 50% 40%, black 30%, transparent 80%);
     animation: gridMove 25s linear infinite;
   }
-
-  @keyframes gridMove {
-    0% { background-position: 0 0, 0 0; }
-    100% { background-position: 48px 48px, 48px 48px; }
-  }
-
+  @keyframes gridMove { to { background-position: 48px 48px, 48px 48px; } }
   .card {
     position: relative;
     background: var(--panel);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 32px 28px;
-    width: 100%;
-    max-width: 640px;
-    box-shadow:
-      0 0 0 1px rgba(0,229,255,0.08),
-      0 20px 60px rgba(0,0,0,0.6),
-      0 0 80px rgba(0,229,255,0.08) inset;
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--border); border-radius: 20px;
+    padding: 32px 28px; width: 100%; max-width: 640px;
+    box-shadow: 0 0 0 1px rgba(0,229,255,0.08), 0 20px 60px rgba(0,0,0,0.6), 0 0 80px rgba(0,229,255,0.08) inset;
     animation: cardIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
   }
-
-  @keyframes cardIn {
-    from { opacity: 0; transform: translateY(20px) scale(0.98); }
-    to { opacity: 1; transform: translateY(0) scale(1); }
-  }
-
+  @keyframes cardIn { from { opacity: 0; transform: translateY(20px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
   .card::before, .card::after {
-    content: '';
-    position: absolute;
-    width: 24px; height: 24px;
-    border: 2px solid var(--neon);
-    pointer-events: none;
+    content: ''; position: absolute; width: 24px; height: 24px;
+    border: 2px solid var(--neon); pointer-events: none;
   }
-  .card::before {
-    top: -1px; left: -1px;
-    border-right: none; border-bottom: none;
-    border-top-left-radius: 20px;
-    box-shadow: -2px -2px 12px rgba(0,229,255,0.5);
-  }
-  .card::after {
-    bottom: -1px; right: -1px;
-    border-left: none; border-top: none;
-    border-bottom-right-radius: 20px;
-    box-shadow: 2px 2px 12px rgba(0,229,255,0.5);
-  }
-
-  .header {
-    margin-bottom: 26px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid rgba(0,229,255,0.15);
-    position: relative;
-  }
+  .card::before { top: -1px; left: -1px; border-right: none; border-bottom: none; border-top-left-radius: 20px; box-shadow: -2px -2px 12px rgba(0,229,255,0.5); }
+  .card::after { bottom: -1px; right: -1px; border-left: none; border-top: none; border-bottom-right-radius: 20px; box-shadow: 2px 2px 12px rgba(0,229,255,0.5); }
+  .header { margin-bottom: 26px; padding-bottom: 20px; border-bottom: 1px solid rgba(0,229,255,0.15); position: relative; }
   .header::after {
-    content: '';
-    position: absolute;
-    bottom: -1px; left: 0;
-    width: 80px; height: 2px;
+    content: ''; position: absolute; bottom: -1px; left: 0; width: 80px; height: 2px;
     background: linear-gradient(90deg, var(--neon), transparent);
     box-shadow: 0 0 12px var(--neon);
   }
-
   h1 {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 24px;
-    font-weight: 900;
-    letter-spacing: 2px;
+    font-family: 'Orbitron', sans-serif; font-size: 24px; font-weight: 900; letter-spacing: 2px;
     background: linear-gradient(90deg, #fff 0%, var(--neon) 50%, var(--neon-2) 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    text-transform: uppercase;
-    margin-bottom: 6px;
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    text-transform: uppercase; margin-bottom: 6px;
   }
-
-  .sub {
-    font-size: 13px;
-    color: var(--muted);
-    letter-spacing: 0.5px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
+  .sub { font-size: 13px; color: var(--muted); letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
   .sub::before {
-    content: '';
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--neon);
-    box-shadow: 0 0 8px var(--neon);
+    content: ''; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--neon); box-shadow: 0 0 8px var(--neon);
     animation: pulse 1.8s ease-in-out infinite;
   }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.4; transform: scale(0.8); }
-  }
-
+  @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.8); } }
   label {
-    display: block;
-    font-family: 'Orbitron', sans-serif;
-    font-size: 10.5px;
-    font-weight: 700;
-    letter-spacing: 2px;
-    color: var(--neon);
-    text-transform: uppercase;
-    margin-bottom: 8px;
+    display: block; font-family: 'Orbitron', sans-serif; font-size: 10.5px;
+    font-weight: 700; letter-spacing: 2px; color: var(--neon);
+    text-transform: uppercase; margin-bottom: 8px;
     text-shadow: 0 0 8px rgba(0,229,255,0.4);
   }
-
   input, select, textarea {
-    padding: 12px 14px;
-    border-radius: 10px;
-    border: 1px solid rgba(0,229,255,0.2);
-    background: rgba(5, 6, 12, 0.7);
-    color: var(--text);
-    font-size: 15px;
-    font-weight: 500;
-    font-family: 'Rajdhani', sans-serif;
-    outline: none;
-    transition: all 0.2s ease;
-    width: 100%;
+    padding: 12px 14px; border-radius: 10px;
+    border: 1px solid rgba(0,229,255,0.2); background: rgba(5, 6, 12, 0.7);
+    color: var(--text); font-size: 15px; font-weight: 500;
+    font-family: 'Rajdhani', sans-serif; outline: none;
+    transition: all 0.2s ease; width: 100%;
   }
-
   input:hover, select:hover, textarea:hover { border-color: rgba(0,229,255,0.4); }
   input:focus, select:focus, textarea:focus {
     border-color: var(--neon);
     box-shadow: 0 0 0 3px rgba(0,229,255,0.1), 0 0 20px rgba(0,229,255,0.25);
     background: rgba(5, 6, 12, 0.9);
   }
-
   select {
-    cursor: pointer;
-    appearance: none;
+    cursor: pointer; appearance: none;
     background-image: url("data:image/svg+xml;utf8,<svg fill='%2300e5ff' height='20' viewBox='0 0 24 24' width='20' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
-    background-repeat: no-repeat;
-    background-position: right 8px center;
+    background-repeat: no-repeat; background-position: right 8px center;
     padding-right: 34px;
   }
   select option { background: #0a0e1c; color: var(--text); }
-
   textarea {
-    min-height: 110px;
-    resize: vertical;
-    font-family: 'Courier New', monospace;
-    font-size: 12.5px;
-    line-height: 1.5;
+    min-height: 130px; resize: vertical;
+    font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.5;
   }
-
-  .input-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-  }
-
-  /* ===== UPLOAD AREA ===== */
+  .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
   .drop-zone {
-    margin-top: 4px;
-    padding: 28px 18px;
-    border: 2px dashed rgba(0,229,255,0.35);
-    border-radius: 14px;
-    text-align: center;
-    cursor: pointer;
-    background: rgba(0,229,255,0.03);
-    transition: all 0.25s ease;
-    position: relative;
-    overflow: hidden;
+    margin-top: 4px; padding: 28px 18px;
+    border: 2px dashed rgba(0,229,255,0.35); border-radius: 14px;
+    text-align: center; cursor: pointer;
+    background: rgba(0,229,255,0.03); transition: all 0.25s ease;
+    position: relative; overflow: hidden;
   }
-  .drop-zone:hover {
-    border-color: var(--neon);
-    background: rgba(0,229,255,0.08);
-    box-shadow: 0 0 30px rgba(0,229,255,0.2);
-  }
-  .drop-zone.dragover {
-    border-color: var(--neon);
-    background: rgba(0,229,255,0.15);
-    box-shadow: 0 0 40px rgba(0,229,255,0.4);
-    transform: scale(1.01);
-  }
-  .drop-zone.loading {
-    pointer-events: none;
-    opacity: 0.7;
-  }
-
-  .drop-icon {
-    font-size: 32px;
-    margin-bottom: 8px;
-    filter: drop-shadow(0 0 12px rgba(0,229,255,0.7));
-  }
-  .drop-text {
-    font-size: 14px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    color: var(--text);
-    margin-bottom: 4px;
-  }
-  .drop-sub {
-    font-size: 11.5px;
-    color: var(--muted);
-    letter-spacing: 0.5px;
-  }
-
-  /* ===== PREVIEW ===== */
-  .preview-wrap {
-    display: none;
-    margin-top: 14px;
-    padding: 12px;
-    background: rgba(5,6,12,0.6);
-    border: 1px solid rgba(0,229,255,0.2);
-    border-radius: 12px;
-  }
+  .drop-zone:hover { border-color: var(--neon); background: rgba(0,229,255,0.08); box-shadow: 0 0 30px rgba(0,229,255,0.2); }
+  .drop-zone.dragover { border-color: var(--neon); background: rgba(0,229,255,0.15); box-shadow: 0 0 40px rgba(0,229,255,0.4); transform: scale(1.01); }
+  .drop-icon { font-size: 32px; margin-bottom: 8px; filter: drop-shadow(0 0 12px rgba(0,229,255,0.7)); }
+  .drop-text { font-size: 14px; font-weight: 600; letter-spacing: 0.5px; color: var(--text); margin-bottom: 4px; }
+  .drop-sub { font-size: 11.5px; color: var(--muted); letter-spacing: 0.5px; }
+  .preview-wrap { display: none; margin-top: 14px; padding: 12px; background: rgba(5,6,12,0.6); border: 1px solid rgba(0,229,255,0.2); border-radius: 12px; }
   .preview-wrap.show { display: block; animation: legIn 0.4s ease; }
-
-  .preview-img {
-    width: 100%;
-    max-height: 260px;
-    object-fit: contain;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    display: block;
-  }
-
-  .preview-actions {
-    display: flex;
-    gap: 8px;
-  }
+  .preview-img { width: 100%; max-height: 260px; object-fit: contain; border-radius: 8px; margin-bottom: 10px; display: block; }
+  .preview-actions { display: flex; gap: 8px; }
   .preview-actions button { flex: 1; }
-
-  /* ===== PROGRESS ===== */
-  .progress-wrap {
-    display: none;
-    margin-top: 14px;
-  }
+  .progress-wrap { display: none; margin-top: 14px; }
   .progress-wrap.show { display: block; }
-
-  .progress-bar {
-    height: 6px;
-    background: rgba(0,229,255,0.1);
-    border-radius: 3px;
-    overflow: hidden;
-    margin-bottom: 8px;
-    border: 1px solid rgba(0,229,255,0.2);
-  }
-  .progress-fill {
-    height: 100%;
-    width: 0%;
-    background: linear-gradient(90deg, var(--neon), var(--neon-2));
-    border-radius: 3px;
-    transition: width 0.25s ease;
-    box-shadow: 0 0 12px var(--neon);
-  }
-  .progress-text {
-    font-size: 12px;
-    color: var(--neon);
-    letter-spacing: 1px;
-    font-family: 'Orbitron', sans-serif;
-    text-align: center;
-  }
-
-  /* ===== DETECTED TEXT PANEL ===== */
-  .detected-wrap {
-    display: none;
-    margin-top: 14px;
-    padding: 14px;
-    background: rgba(124,58,237,0.06);
-    border: 1px solid rgba(124,58,237,0.3);
-    border-radius: 12px;
-  }
+  .progress-bar { height: 6px; background: rgba(0,229,255,0.1); border-radius: 3px; overflow: hidden; margin-bottom: 8px; border: 1px solid rgba(0,229,255,0.2); }
+  .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--neon), var(--neon-2)); border-radius: 3px; transition: width 0.25s ease; box-shadow: 0 0 12px var(--neon); }
+  .progress-text { font-size: 12px; color: var(--neon); letter-spacing: 1px; font-family: 'Orbitron', sans-serif; text-align: center; }
+  .detected-wrap { display: none; margin-top: 14px; padding: 14px; background: rgba(124,58,237,0.06); border: 1px solid rgba(124,58,237,0.3); border-radius: 12px; }
   .detected-wrap.show { display: block; animation: legIn 0.4s ease; }
-
-  .detected-wrap textarea {
-    margin-bottom: 10px;
-  }
-
-  .detected-actions {
-    display: flex;
-    gap: 8px;
-  }
+  .detected-wrap textarea { margin-bottom: 10px; }
+  .detected-actions { display: flex; gap: 8px; }
   .detected-actions button { flex: 1; }
-
-  /* ===== LEGS ===== */
   .leg {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 10px;
-    align-items: center;
-    padding: 10px;
-    background: rgba(0,229,255,0.03);
-    border: 1px solid rgba(0,229,255,0.1);
-    border-radius: 12px;
-    transition: all 0.2s;
-    animation: legIn 0.4s ease;
+    display: flex; gap: 10px; margin-bottom: 10px; align-items: center;
+    padding: 10px; background: rgba(0,229,255,0.03);
+    border: 1px solid rgba(0,229,255,0.1); border-radius: 12px;
+    transition: all 0.2s; animation: legIn 0.4s ease;
   }
-  @keyframes legIn {
-    from { opacity: 0; transform: translateX(-10px); }
-    to { opacity: 1; transform: translateX(0); }
-  }
-  .leg:hover {
-    border-color: rgba(0,229,255,0.35);
-    background: rgba(0,229,255,0.05);
-    box-shadow: 0 0 20px rgba(0,229,255,0.1);
-  }
+  @keyframes legIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+  .leg:hover { border-color: rgba(0,229,255,0.35); background: rgba(0,229,255,0.05); box-shadow: 0 0 20px rgba(0,229,255,0.1); }
   .leg input.odds { flex: 1; min-width: 0; border-radius: 8px; }
   .leg select.result-type { width: 130px; flex-shrink: 0; border-radius: 8px; }
-
   button {
-    cursor: pointer;
-    border: none;
-    border-radius: 10px;
-    padding: 12px 16px;
-    font-weight: 700;
-    font-size: 13px;
-    font-family: 'Orbitron', sans-serif;
-    letter-spacing: 1.5px;
+    cursor: pointer; border: none; border-radius: 10px;
+    padding: 12px 16px; font-weight: 700; font-size: 13px;
+    font-family: 'Orbitron', sans-serif; letter-spacing: 1.5px;
     text-transform: uppercase;
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
-
   .btn-primary {
     background: linear-gradient(135deg, var(--neon) 0%, #0091ff 100%);
-    color: #05060c;
-    width: 100%;
-    margin-top: 16px;
-    padding: 16px;
-    font-size: 14px;
+    color: #05060c; width: 100%; margin-top: 16px; padding: 16px; font-size: 14px;
     box-shadow: 0 4px 20px rgba(0,229,255,0.4), 0 0 40px rgba(0,229,255,0.15);
-    position: relative;
-    overflow: hidden;
+    position: relative; overflow: hidden;
   }
-  .btn-primary::before {
-    content: '';
-    position: absolute;
-    top: 0; left: -100%;
-    width: 100%; height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-    transition: left 0.6s;
-  }
+  .btn-primary::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent); transition: left 0.6s; }
   .btn-primary:hover::before { left: 100%; }
-  .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 30px rgba(0,229,255,0.6), 0 0 60px rgba(0,229,255,0.3);
-  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 30px rgba(0,229,255,0.6), 0 0 60px rgba(0,229,255,0.3); }
   .btn-primary:active { transform: translateY(0) scale(0.99); }
-
-  .btn-secondary {
-    background: rgba(0,229,255,0.08);
-    color: var(--neon);
-    margin-top: 6px;
-    width: 100%;
-    border: 1px solid rgba(0,229,255,0.3);
-  }
-  .btn-secondary:hover {
-    background: rgba(0,229,255,0.15);
-    border-color: var(--neon);
-    box-shadow: 0 0 20px rgba(0,229,255,0.2);
-  }
-
-  .btn-purple {
-    background: rgba(124,58,237,0.15);
-    color: #c4b5fd;
-    border: 1px solid rgba(124,58,237,0.4);
-  }
-  .btn-purple:hover {
-    background: rgba(124,58,237,0.3);
-    border-color: var(--neon-2);
-    box-shadow: 0 0 20px rgba(124,58,237,0.3);
-  }
-
-  .btn-remove {
-    background: rgba(255,0,110,0.1);
-    color: var(--neon-3);
-    padding: 12px 14px;
-    flex-shrink: 0;
-    border: 1px solid rgba(255,0,110,0.3);
-    font-size: 14px;
-    letter-spacing: 0;
-    border-radius: 8px;
-  }
-  .btn-remove:hover {
-    background: rgba(255,0,110,0.25);
-    box-shadow: 0 0 16px rgba(255,0,110,0.5);
-  }
-
-  .result {
-    margin-top: 20px;
-    padding: 20px;
-    background: rgba(5, 6, 12, 0.7);
-    border-radius: 14px;
-    line-height: 1.9;
-    font-size: 15px;
-    border: 1px solid rgba(0,229,255,0.2);
-    position: relative;
-  }
-  .result::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, var(--neon), transparent);
-    border-radius: 14px 14px 0 0;
-    opacity: 0.6;
-  }
-
-  .breakdown {
-    font-size: 12px;
-    color: var(--muted);
-    padding: 4px 0;
-    border-bottom: 1px dashed rgba(0,229,255,0.1);
-    letter-spacing: 0.3px;
-  }
+  .btn-secondary { background: rgba(0,229,255,0.08); color: var(--neon); margin-top: 6px; width: 100%; border: 1px solid rgba(0,229,255,0.3); }
+  .btn-secondary:hover { background: rgba(0,229,255,0.15); border-color: var(--neon); box-shadow: 0 0 20px rgba(0,229,255,0.2); }
+  .btn-purple { background: rgba(124,58,237,0.15); color: #c4b5fd; border: 1px solid rgba(124,58,237,0.4); }
+  .btn-purple:hover { background: rgba(124,58,237,0.3); border-color: var(--neon-2); box-shadow: 0 0 20px rgba(124,58,237,0.3); }
+  .btn-remove { background: rgba(255,0,110,0.1); color: var(--neon-3); padding: 12px 14px; flex-shrink: 0; border: 1px solid rgba(255,0,110,0.3); font-size: 14px; letter-spacing: 0; border-radius: 8px; }
+  .btn-remove:hover { background: rgba(255,0,110,0.25); box-shadow: 0 0 16px rgba(255,0,110,0.5); }
+  .result { margin-top: 20px; padding: 20px; background: rgba(5, 6, 12, 0.7); border-radius: 14px; line-height: 1.9; font-size: 15px; border: 1px solid rgba(0,229,255,0.2); position: relative; }
+  .result::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--neon), transparent); border-radius: 14px 14px 0 0; opacity: 0.6; }
+  .breakdown { font-size: 12px; color: var(--muted); padding: 4px 0; border-bottom: 1px dashed rgba(0,229,255,0.1); letter-spacing: 0.3px; }
   .breakdown:last-of-type { border-bottom: none; }
-
-  hr {
-    border: none;
-    border-top: 1px solid rgba(0,229,255,0.15);
-    margin: 14px 0;
-  }
-
-  .row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 5px 0;
-  }
-  .row span:first-child {
-    color: var(--muted);
-    font-size: 13px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    font-weight: 600;
-  }
-
-  .big {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 22px;
-    font-weight: 900;
-    color: #fff;
-    text-shadow: 0 0 20px rgba(0,229,255,0.6);
-    letter-spacing: 1px;
-  }
-
-  .status-win {
-    color: var(--green);
-    font-family: 'Orbitron', sans-serif;
-    font-weight: 900;
-    text-shadow: 0 0 20px rgba(0,255,163,0.7);
-  }
-  .status-lose {
-    color: #ff2d6f;
-    font-family: 'Orbitron', sans-serif;
-    font-weight: 900;
-    text-shadow: 0 0 20px rgba(255,45,111,0.7);
-  }
-
+  hr { border: none; border-top: 1px solid rgba(0,229,255,0.15); margin: 14px 0; }
+  .row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; }
+  .row span:first-child { color: var(--muted); font-size: 13px; letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+  .big { font-family: 'Orbitron', sans-serif; font-size: 22px; font-weight: 900; color: #fff; text-shadow: 0 0 20px rgba(0,229,255,0.6); letter-spacing: 1px; }
+  .status-win { color: var(--green); font-family: 'Orbitron', sans-serif; font-weight: 900; text-shadow: 0 0 20px rgba(0,255,163,0.7); }
+  .status-lose { color: #ff2d6f; font-family: 'Orbitron', sans-serif; font-weight: 900; text-shadow: 0 0 20px rgba(255,45,111,0.7); }
   .saldo-panel {
-    margin-top: 16px;
-    padding: 18px;
-    border-radius: 14px;
+    margin-top: 16px; padding: 18px; border-radius: 14px;
     background: linear-gradient(135deg, rgba(0,229,255,0.08) 0%, rgba(124,58,237,0.08) 100%);
-    border: 1px solid rgba(0,229,255,0.35);
-    position: relative;
-    overflow: hidden;
+    border: 1px solid rgba(0,229,255,0.35); position: relative; overflow: hidden;
     animation: saldoGlow 3s ease-in-out infinite alternate;
   }
   @keyframes saldoGlow {
     from { box-shadow: 0 0 20px rgba(0,229,255,0.15), inset 0 0 20px rgba(0,229,255,0.05); }
-    to   { box-shadow: 0 0 40px rgba(0,229,255,0.35), inset 0 0 30px rgba(124,58,237,0.1); }
+    to { box-shadow: 0 0 40px rgba(0,229,255,0.35), inset 0 0 30px rgba(124,58,237,0.1); }
   }
-  .saldo-panel::before {
-    content: '';
-    position: absolute;
-    top: -50%; left: -50%;
-    width: 200%; height: 200%;
-    background: conic-gradient(from 0deg, transparent, rgba(0,229,255,0.15), transparent 30%);
-    animation: rotate 8s linear infinite;
-    pointer-events: none;
-  }
+  .saldo-panel::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: conic-gradient(from 0deg, transparent, rgba(0,229,255,0.15), transparent 30%); animation: rotate 8s linear infinite; pointer-events: none; }
   @keyframes rotate { to { transform: rotate(360deg); } }
-
-  .saldo-label {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 2.5px;
-    color: var(--neon);
-    text-transform: uppercase;
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    position: relative; z-index: 1;
-  }
-  .saldo-label::before {
-    content: '◈';
-    color: var(--gold);
-    text-shadow: 0 0 10px var(--gold);
-    animation: pulse 1.8s ease-in-out infinite;
-  }
-
-  .saldo-value {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 32px;
-    font-weight: 900;
-    letter-spacing: 1px;
-    position: relative; z-index: 1;
-    background: linear-gradient(90deg, #fff 0%, var(--neon) 60%, var(--gold) 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    line-height: 1.2;
-  }
-  .saldo-value.lose {
-    background: linear-gradient(90deg, #fff 0%, #ff2d6f 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-
-  .saldo-sub {
-    position: relative; z-index: 1;
-    font-size: 12.5px;
-    color: var(--muted);
-    margin-top: 8px;
-    letter-spacing: 0.5px;
-    line-height: 1.6;
-  }
-  .saldo-sub .highlight {
-    color: var(--green);
-    font-weight: 700;
-    font-family: 'Orbitron', sans-serif;
-    font-size: 12px;
-  }
+  .saldo-label { font-family: 'Orbitron', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 2.5px; color: var(--neon); text-transform: uppercase; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; position: relative; z-index: 1; }
+  .saldo-label::before { content: '◈'; color: var(--gold); text-shadow: 0 0 10px var(--gold); animation: pulse 1.8s ease-in-out infinite; }
+  .saldo-value { font-family: 'Orbitron', sans-serif; font-size: 32px; font-weight: 900; letter-spacing: 1px; position: relative; z-index: 1; background: linear-gradient(90deg, #fff 0%, var(--neon) 60%, var(--gold) 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.2; }
+  .saldo-value.lose { background: linear-gradient(90deg, #fff 0%, #ff2d6f 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  .saldo-sub { position: relative; z-index: 1; font-size: 12.5px; color: var(--muted); margin-top: 8px; letter-spacing: 0.5px; line-height: 1.6; }
+  .saldo-sub .highlight { color: var(--green); font-weight: 700; font-family: 'Orbitron', sans-serif; font-size: 12px; }
   .saldo-sub .highlight.lose { color: #ff2d6f; }
-
-  .hint {
-    font-size: 12px;
-    color: var(--muted);
-    margin-top: 20px;
-    line-height: 1.8;
-    padding: 16px;
-    background: rgba(124,58,237,0.05);
-    border-radius: 12px;
-    border-left: 3px solid var(--neon-2);
-    letter-spacing: 0.3px;
-  }
-  .hint b {
-    color: var(--neon);
-    font-family: 'Orbitron', sans-serif;
-    font-size: 10.5px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-  }
-  .hint code {
-    background: rgba(0,229,255,0.1);
-    padding: 2px 6px;
-    border-radius: 4px;
-    color: var(--neon);
-    font-size: 11.5px;
-    font-family: 'Courier New', monospace;
-    border: 1px solid rgba(0,229,255,0.2);
-  }
-
+  .hint { font-size: 12px; color: var(--muted); margin-top: 20px; line-height: 1.8; padding: 16px; background: rgba(124,58,237,0.05); border-radius: 12px; border-left: 3px solid var(--neon-2); letter-spacing: 0.3px; }
+  .hint b { color: var(--neon); font-family: 'Orbitron', sans-serif; font-size: 10.5px; letter-spacing: 1.5px; text-transform: uppercase; }
+  .hint code { background: rgba(0,229,255,0.1); padding: 2px 6px; border-radius: 4px; color: var(--neon); font-size: 11.5px; font-family: 'Courier New', monospace; border: 1px solid rgba(0,229,255,0.2); }
   .section { margin-top: 20px; }
-
-  .ocr-status {
-    margin-top: 10px;
-    font-size: 12.5px;
-    letter-spacing: 0.5px;
-    padding: 10px 12px;
-    border-radius: 8px;
-    display: none;
-  }
+  .ocr-status { margin-top: 10px; font-size: 12.5px; letter-spacing: 0.5px; padding: 10px 12px; border-radius: 8px; display: none; }
   .ocr-status.show { display: block; animation: legIn 0.3s ease; }
   .ocr-status.info { color: var(--neon); background: rgba(0,229,255,0.08); border: 1px solid rgba(0,229,255,0.2); }
   .ocr-status.success { color: var(--green); background: rgba(0,255,163,0.08); border: 1px solid rgba(0,255,163,0.2); }
   .ocr-status.error { color: #ff2d6f; background: rgba(255,45,111,0.08); border: 1px solid rgba(255,45,111,0.2); }
-
+  .stat-pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 10px; border-radius: 20px; font-size: 11px;
+    font-family: 'Orbitron', sans-serif; letter-spacing: 0.5px;
+    margin-left: 8px; text-transform: none; font-weight: 600;
+  }
+  .stat-pill.ok { background: rgba(0,255,163,0.15); color: var(--green); border: 1px solid rgba(0,255,163,0.3); }
+  .stat-pill.warn { background: rgba(255,215,0,0.15); color: var(--gold); border: 1px solid rgba(255,215,0,0.3); }
+  .stat-pill.err { background: rgba(255,45,111,0.15); color: #ff2d6f; border: 1px solid rgba(255,45,111,0.3); }
   ::-webkit-scrollbar { width: 8px; }
   ::-webkit-scrollbar-track { background: var(--bg-1); }
-  ::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, var(--neon), var(--neon-2));
-    border-radius: 4px;
-  }
-
+  ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, var(--neon), var(--neon-2)); border-radius: 4px; }
   @media (max-width: 520px) {
     .card { padding: 24px 18px; border-radius: 16px; }
     h1 { font-size: 18px; letter-spacing: 1.5px; }
@@ -664,7 +239,6 @@
     <div class="sub">Upload bill, auto-read, hitung saldo efektif</div>
   </div>
 
-  <!-- ====== UPLOAD SECTION ====== -->
   <div class="section">
     <label>Upload Bill Parlay (Opsional)</label>
     <div id="dropZone" class="drop-zone">
@@ -699,7 +273,6 @@
     </div>
   </div>
 
-  <!-- ====== SALDO & STAKE ====== -->
   <div class="input-grid section">
     <div>
       <label for="saldoAwal">Saldo Awal</label>
@@ -707,11 +280,10 @@
     </div>
     <div>
       <label for="stake">Nilai Taruhan</label>
-      <input type="number" id="stake" value="100000" min="0" step="any">
+      <input type="number" id="stake" value="104" min="0" step="any">
     </div>
   </div>
 
-  <!-- ====== LEGS ====== -->
   <div class="section">
     <label>Daftar Pilihan (Odds &amp; Hasil)</label>
     <div id="legs"></div>
@@ -736,7 +308,7 @@
 
 <script>
   /* ============================================================
-     UPLOAD & OCR
+     OCR + PARSER (context-aware)
   ============================================================ */
   const dropZone = document.getElementById('dropZone');
   const fileInput = document.getElementById('fileInput');
@@ -748,16 +320,14 @@
   const ocrStatus = document.getElementById('ocrStatus');
   const detectedWrap = document.getElementById('detectedWrap');
   const detectedText = document.getElementById('detectedText');
+  const legsContainer = document.getElementById('legs');
 
   let currentFile = null;
 
-  // Klik drop zone → buka file picker
   dropZone.addEventListener('click', () => fileInput.click());
   fileInput.addEventListener('change', e => {
     if (e.target.files && e.target.files[0]) handleFile(e.target.files[0]);
   });
-
-  // Drag & drop
   ['dragenter', 'dragover'].forEach(evt => {
     dropZone.addEventListener(evt, e => {
       e.preventDefault(); e.stopPropagation();
@@ -775,14 +345,12 @@
     if (files && files[0]) handleFile(files[0]);
   });
 
-  // Handle file → preview → OCR
   function handleFile(file) {
     if (!file.type.startsWith('image/')) {
       setStatus('File harus berupa gambar, bre.', 'error');
       return;
     }
     currentFile = file;
-
     const reader = new FileReader();
     reader.onload = e => {
       previewImg.src = e.target.result;
@@ -794,7 +362,7 @@
   }
 
   function setStatus(msg, type = 'info') {
-    ocrStatus.textContent = msg;
+    ocrStatus.innerHTML = msg;
     ocrStatus.className = 'ocr-status show ' + type;
   }
   function hideStatus() { ocrStatus.className = 'ocr-status'; }
@@ -810,18 +378,14 @@
     hideStatus();
   }
 
-  function clearDetected() {
-    detectedText.value = '';
-  }
+  function clearDetected() { detectedText.value = ''; }
 
-  // ====== OCR ======
   async function runOCR() {
     if (!currentFile) return;
-
     progressWrap.classList.add('show');
     progressFill.style.width = '0%';
     progressText.textContent = 'Menyiapkan mesin OCR... 0%';
-    setStatus('Sedang membaca gambar. Proses ini bisa 5–30 detik tergantung ukuran & kualitas bill.', 'info');
+    setStatus('Sedang membaca gambar. Proses ini bisa 5–30 detik.', 'info');
 
     try {
       const result = await Tesseract.recognize(currentFile, 'eng', {
@@ -843,15 +407,27 @@
       progressText.textContent = 'Selesai!';
 
       if (raw.length < 3) {
-        setStatus('Teks tidak terdeteksi. Coba gambar lebih jelas / lebih terang, bre.', 'error');
-      } else {
-        const count = autoApplyFromText(raw, false);
-        if (count > 0) {
-          setStatus('Bill terbaca! ' + count + ' angka odds terdeteksi dan sudah diisi ke form. Cek & edit kalau perlu.', 'success');
-        } else {
-          setStatus('Teks terbaca, tapi tidak ada odds yang cocok. Cek panel teks di bawah, edit manual, lalu klik "Terapkan ke Form".', 'info');
-        }
+        setStatus('Teks tidak terdeteksi. Coba gambar lebih jelas.', 'error');
+        return;
       }
+
+      const parsed = parseBill(raw);
+
+      if (parsed.odds.length > 0) {
+        legsContainer.innerHTML = '';
+        parsed.odds.forEach(o => addLeg(o.toFixed(2), 'W'));
+      }
+      if (parsed.stake) {
+        document.getElementById('stake').value = parsed.stake;
+      }
+
+      const bits = [];
+      if (parsed.odds.length) bits.push(`<span class="stat-pill ok">✓ ${parsed.odds.length} odds terdeteksi</span>`);
+      if (parsed.stake) bits.push(`<span class="stat-pill ok">✓ stake: ${parsed.stake}</span>`);
+      if (!parsed.odds.length) bits.push(`<span class="stat-pill err">✗ odds tidak ditemukan</span>`);
+      if (!parsed.stake) bits.push(`<span class="stat-pill warn">! stake tidak ditemukan</span>`);
+
+      setStatus('Bill terbaca! ' + bits.join(' ') + '<br><span style="font-size:11px;opacity:0.8;">Cek daftar pilihan di bawah, edit manual kalau ada yang salah baca.</span>', 'success');
     } catch (err) {
       console.error(err);
       setStatus('Gagal membaca bill: ' + (err.message || 'unknown error'), 'error');
@@ -859,115 +435,138 @@
     }
   }
 
-  // ====== PARSER ======
-  // Cari angka desimal dalam range odds yang wajar
-  function extractOdds(text) {
-    // Normalisasi: koma desimal → titik (untuk format Indo)
-    // Tapi hati-hati: 1,85 itu koma desimal; 100,000 itu thousand separator
-    // Heuristik: kalau setelah koma ada 2-3 digit DAN angka depannya < 100 → koma desimal
-    const cleaned = text
-      .replace(/[^\x20-\x7E\n]/g, ' ')
-      .replace(/\s+/g, ' ');
+  /* ============================================================
+     PARSER CONTEXT-AWARE
+     Strategi: baca per baris, prioritaskan keyword "Odds:" dan "@"
+     Skip baris waktu/tanggal/skor/keyword stake.
+  ============================================================ */
 
-    const odds = [];
+  function parseBill(text) {
+    const lines = text
+      .replace(/\r/g, '')
+      .split('\n')
+      .map(l => l.replace(/[^\x20-\x7E]/g, ' ').replace(/\s+/g, ' ').trim())
+      .filter(Boolean);
+
+    const oddsFound = [];       // { v, priority }
     const seen = new Set();
 
-    // Pattern 1: X.XX atau X.XXX (dot desimal)
-    const dotMatches = cleaned.match(/\b\d{1,3}\.\d{2,3}\b/g) || [];
-    dotMatches.forEach(m => {
-      const v = parseFloat(m);
-      if (v >= 1.01 && v < 1000 && !seen.has(m)) {
-        odds.push(v);
-        seen.add(m);
+    const addOdds = (v) => {
+      if (v < 1.01 || v > 100) return;
+      const key = v.toFixed(2);
+      if (seen.has(key)) return;
+      seen.add(key);
+      oddsFound.push(v);
+    };
+
+    for (const line of lines) {
+      const lower = line.toLowerCase();
+
+      // 1. Skip baris waktu / tanggal (23/09 16:00)
+      const isDateLine = /\d{1,2}\s*[\/\-]\s*\d{1,2}/.test(line) && /\d{1,2}[:.]\d{2}/.test(line);
+      if (isDateLine) continue;
+      if (/^\d{1,2}[:.]\d{2}(\s|$)/.test(line)) continue;
+
+      // 2. Skip baris "Result : X - Y" (skor)
+      if (/result\s*[:=]/i.test(line)) continue;
+
+      // 3. Skip baris "Bet Amount", "Stake", "Total"
+      if (/bet\s*amount|stake|taruhan|total\s*bet/i.test(line)) continue;
+
+      // 4. Prioritas 1: "Odds : X.XX" atau "Odds: X.XX" atau "Odds X.XX"
+      const mOdds = line.match(/odds?\s*[:=]?\s*(\d{1,2}(?:[.,]\d{1,3})?)\b/i);
+      if (mOdds) {
+        const v = parseFloat(mOdds[1].replace(',', '.'));
+        if (v >= 1.01 && v <= 100) {
+          addOdds(v);
+          continue;
+        }
       }
-    });
 
-    // Pattern 2: X,XX atau X,XXX (koma desimal — format Indo)
-    const commaMatches = cleaned.match(/\b\d{1,3},\d{2,3}\b/g) || [];
-    commaMatches.forEach(m => {
-      const v = parseFloat(m.replace(',', '.'));
-      if (v >= 1.01 && v < 1000 && !seen.has(m)) {
-        odds.push(v);
-        seen.add(m);
+      // 5. Prioritas 2: "@ X.XXX" (biasanya di akhir baris)
+      const mAt = line.match(/@\s*(\d{1,2}(?:[.,]\d{1,3})?)\b/);
+      if (mAt) {
+        const v = parseFloat(mAt[1].replace(',', '.'));
+        if (v >= 1.01 && v <= 100) {
+          addOdds(v);
+          continue;
+        }
       }
-    });
+    }
 
-    return odds;
-  }
-
-  // Cari stake dari teks
-  function extractStake(text) {
-    const cleaned = text.replace(/[^\x20-\x7E\n]/g, ' ');
-
-    const patterns = [
-      /(?:Rp\.?|IDR|rp\.?)\s*([\d]{1,3}(?:[.,]\d{3})+|\d{4,})/i,
-      /\b(?:stake|bet|taruhan|total|amount)\b[^\d]*([\d]{1,3}(?:[.,]\d{3})+|\d{4,})/i,
-      /\b([\d]{1,3}(?:[.,]\d{3}){1,3})\b/
+    // Stake: cari "Bet Amount : X" / "Stake : X" / "Rp X" / "IDR X"
+    let stake = null;
+    const stakePatterns = [
+      /bet\s*amount\s*[:=]?\s*([\d.,]+)/i,
+      /(?:stake|taruhan)\s*[:=]?\s*([\d.,]+)/i,
+      /(?:Rp\.?|IDR)\s*([\d.,]+)/i,
     ];
-
-    for (const p of patterns) {
-      const m = cleaned.match(p);
-      if (m && m[1]) {
-        const n = parseInt(m[1].replace(/[.,]/g, ''), 10);
-        if (n >= 1000 && n < 1e12) return n;
+    for (const p of stakePatterns) {
+      const m = text.match(p);
+      if (m) {
+        const n = parseAmount(m[1]);
+        if (n >= 10 && n < 1e12) { stake = Math.round(n); break; }
       }
     }
-    return null;
+
+    return { odds: oddsFound, stake };
   }
 
-  // Cari marker W / WH / D / LH / L di teks (per baris)
-  function extractStatuses(text) {
-    const lines = text.split('\n');
-    const results = [];
-    lines.forEach(line => {
-      const clean = line.replace(/[^\x20-\x7E]/g, '').trim();
-      const m = clean.match(/\b(WH|LH|W|D|L)\b/);
-      if (m) results.push(m[1]);
-    });
-    return results;
-  }
+  // Parse angka format Indonesia/US dengan deteksi desimal vs thousand separator
+  function parseAmount(str) {
+    let s = String(str).trim();
+    if (!s) return 0;
+    const dots = (s.match(/\./g) || []).length;
+    const commas = (s.match(/,/g) || []).length;
 
-  // ====== AUTO APPLY ======
-  function autoApplyFromText(text, silent = true) {
-    const odds = extractOdds(text);
-    const stake = extractStake(text);
+    if (dots === 0 && commas === 0) return parseFloat(s) || 0;
 
-    if (!odds.length && !stake) return 0;
-
-    // Reset legs, isi dengan odds yang ketemu
-    if (odds.length) {
-      legsContainer.innerHTML = '';
-      odds.forEach(o => addLeg(o.toFixed(2), 'W'));
+    if (dots > 0 && commas === 0) {
+      if (dots > 1) return parseFloat(s.replace(/\./g, '')) || 0;
+      const [i, d] = s.split('.');
+      if (d.length === 3 && i.length <= 3) return parseInt(s.replace('.', ''), 10) || 0;
+      return parseFloat(s) || 0;
     }
 
-    // Set stake kalau ketemu
-    if (stake) {
-      document.getElementById('stake').value = stake;
+    if (commas > 0 && dots === 0) {
+      if (commas > 1) return parseFloat(s.replace(/,/g, '')) || 0;
+      const [i, d] = s.split(',');
+      if (d.length === 3 && i.length <= 3) return parseInt(s.replace(',', ''), 10) || 0;
+      return parseFloat(s.replace(',', '.')) || 0;
     }
 
-    return odds.length;
+    // Keduanya ada: yang terakhir = desimal
+    if (s.lastIndexOf('.') > s.lastIndexOf(',')) {
+      return parseFloat(s.replace(/,/g, '')) || 0;
+    }
+    return parseFloat(s.replace(/\./g, '').replace(',', '.')) || 0;
   }
 
-  // ====== TOMBOL "Terapkan ke Form" ======
   function applyDetected() {
     const text = detectedText.value || '';
-    if (!text.trim()) {
-      setStatus('Teks masih kosong, bre.', 'error');
-      return;
+    if (!text.trim()) { setStatus('Teks masih kosong, bre.', 'error'); return; }
+
+    const parsed = parseBill(text);
+
+    if (parsed.odds.length) {
+      legsContainer.innerHTML = '';
+      parsed.odds.forEach(o => addLeg(o.toFixed(2), 'W'));
     }
-    const count = autoApplyFromText(text);
-    if (count > 0) {
-      setStatus('Berhasil! ' + count + ' odds diterapkan ke form.', 'success');
-    } else {
-      setStatus('Tidak ada odds yang cocok dari teks. Format yang dicari: angka seperti 1.85 atau 2.10.', 'error');
+    if (parsed.stake) {
+      document.getElementById('stake').value = parsed.stake;
     }
+
+    const bits = [];
+    if (parsed.odds.length) bits.push(`<span class="stat-pill ok">✓ ${parsed.odds.length} odds</span>`);
+    if (parsed.stake) bits.push(`<span class="stat-pill ok">✓ stake: ${parsed.stake}</span>`);
+    if (!parsed.odds.length) bits.push(`<span class="stat-pill err">✗ odds tidak ada</span>`);
+
+    setStatus('Diterapkan ke form. ' + bits.join(' '), parsed.odds.length ? 'success' : 'error');
   }
 
   /* ============================================================
      KALKULATOR PARLAY
   ============================================================ */
-  const legsContainer = document.getElementById('legs');
-
   const TYPE_OPTIONS = [
     { value: 'W',  label: 'W — Menang' },
     { value: 'WH', label: 'WH — Menang ½' },
@@ -982,9 +581,7 @@
     wrap.innerHTML = `
       <input type="number" class="odds" placeholder="Odds (contoh 1.85)" step="0.01" min="1" value="${odds}">
       <select class="result-type">
-        ${TYPE_OPTIONS.map(o =>
-          `<option value="${o.value}" ${o.value === type ? 'selected' : ''}>${o.label}</option>`
-        ).join('')}
+        ${TYPE_OPTIONS.map(o => `<option value="${o.value}" ${o.value === type ? 'selected' : ''}>${o.label}</option>`).join('')}
       </select>
       <button class="btn-remove" onclick="this.parentElement.remove()">✕</button>
     `;
@@ -1012,41 +609,27 @@
     const legEls = document.querySelectorAll('.leg');
     const result = document.getElementById('result');
 
-    if (legEls.length === 0) {
-      result.innerHTML = 'Minimal harus ada 1 pilihan, bre.';
-      return;
-    }
-    if (stake > saldoAwal) {
-      result.innerHTML = '<span class="status-lose">Nilai taruhan melebihi saldo awal, bre!</span>';
-      return;
-    }
+    if (legEls.length === 0) { result.innerHTML = 'Minimal harus ada 1 pilihan, bre.'; return; }
+    if (stake > saldoAwal) { result.innerHTML = '<span class="status-lose">Nilai taruhan melebihi saldo awal, bre!</span>'; return; }
 
-    let totalOdds = 1;
-    let valid = true;
-    let anyLose = false;
+    let totalOdds = 1, valid = true, anyLose = false;
     const breakdown = [];
 
     legEls.forEach((el, i) => {
       const odds = parseFloat(el.querySelector('.odds').value);
       const type = el.querySelector('.result-type').value;
-
       if (isNaN(odds) || odds < 1) { valid = false; return; }
-
       if (type === 'L') {
         anyLose = true;
         breakdown.push(`Pilihan ${i + 1}: odds ${odds.toFixed(2)} → L (kalah penuh)`);
         return;
       }
-
       const adj = convertOdds(odds, type);
       totalOdds *= adj;
       breakdown.push(`Pilihan ${i + 1}: odds ${odds.toFixed(2)} → ${type} (efektif ${adj.toFixed(2)})`);
     });
 
-    if (!valid) {
-      result.innerHTML = 'Pastikan semua odds diisi angka ≥ 1.00 ya bre.';
-      return;
-    }
+    if (!valid) { result.innerHTML = 'Pastikan semua odds diisi angka ≥ 1.00 ya bre.'; return; }
 
     if (anyLose) {
       const saldoAkhir = saldoAwal - stake;
@@ -1056,15 +639,10 @@
         <div class="row"><span>Saldo Awal</span><span>${formatNum(saldoAwal)}</span></div>
         <div class="row"><span>Taruhan (Hangus)</span><span class="status-lose">−${formatNum(stake)}</span></div>
         <div class="row"><span>Nilai Kembali</span><span>0</span></div>
-        <div style="font-size:12px;color:#7b8ba8;margin-top:10px;">
-          Seluruh kombinasi gugur, jadi taruhan dianggap hangus.
-        </div>
         <div class="saldo-panel">
           <div class="saldo-label">Saldo Efektif Akhir</div>
           <div class="saldo-value lose">${formatNum(saldoAkhir)}</div>
-          <div class="saldo-sub">
-            Kemenangan Bersih: <span class="highlight lose">−${formatNum(stake)}</span>
-          </div>
+          <div class="saldo-sub">Kemenangan Bersih: <span class="highlight lose">−${formatNum(stake)}</span></div>
         </div>
       `;
       return;
@@ -1086,20 +664,14 @@
         <div class="saldo-label">Saldo Efektif Akhir</div>
         <div class="saldo-value ${isWin ? '' : 'lose'}">${formatNum(saldoAkhir)}</div>
         <div class="saldo-sub">
-          Kemenangan Bersih:
-          <span class="highlight ${isWin ? '' : 'lose'}">
-            ${isWin ? '+' : '−'}${formatNum(Math.abs(netResult))}
-          </span>
+          Kemenangan Bersih: <span class="highlight ${isWin ? '' : 'lose'}">${isWin ? '+' : '−'}${formatNum(Math.abs(netResult))}</span>
           <br>
-          ${isWin
-            ? 'Saldo naik dari taruhan ini — hasil plus, lu untung sebesar angka di atas.'
-            : 'Saldo turun dari taruhan ini — hasil minus, lu rugi sebesar angka di atas.'}
+          ${isWin ? 'Hasil plus → lu menang sebesar angka di atas.' : 'Hasil minus → lu rugi sebesar angka di atas.'}
         </div>
       </div>
     `;
   }
 
-  // default
   addLeg('1.85', 'W');
   addLeg('2.10', 'W');
 </script>
