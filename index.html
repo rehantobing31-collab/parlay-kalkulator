@@ -47,20 +47,20 @@
     -webkit-font-smoothing: antialiased;
     position: relative;
     overflow-x: hidden;
+    perspective: 1400px;
   }
 
-  /* === LAYER 1: Animated aurora gradient === */
+  /* Layer 0: aurora gradient */
   body::before {
     content: '';
     position: fixed;
     inset: -20%;
     background:
-      radial-gradient(ellipse 50% 40% at 20% 20%, rgba(16, 185, 129, 0.18), transparent 60%),
-      radial-gradient(ellipse 50% 40% at 80% 30%, rgba(139, 92, 246, 0.14), transparent 60%),
-      radial-gradient(ellipse 60% 50% at 50% 80%, rgba(6, 182, 212, 0.15), transparent 60%),
-      radial-gradient(ellipse 40% 30% at 90% 90%, rgba(16, 185, 129, 0.1), transparent 60%);
-    z-index: -3;
-    animation: auroraShift 18s ease-in-out infinite alternate;
+      radial-gradient(ellipse 50% 40% at 20% 20%, rgba(16, 185, 129, 0.16), transparent 60%),
+      radial-gradient(ellipse 50% 40% at 80% 30%, rgba(139, 92, 246, 0.13), transparent 60%),
+      radial-gradient(ellipse 60% 50% at 50% 80%, rgba(6, 182, 212, 0.14), transparent 60%);
+    z-index: -4;
+    animation: auroraShift 20s ease-in-out infinite alternate;
     pointer-events: none;
   }
   @keyframes auroraShift {
@@ -69,98 +69,126 @@
     100% { transform: translate(-2%, 3%) scale(1.02); }
   }
 
-  /* === LAYER 2: Dot grid === */
+  /* Layer 1: particle canvas */
+  #particles {
+    position: fixed;
+    inset: 0;
+    z-index: -3;
+    pointer-events: none;
+    opacity: 0.55;
+  }
+
+  /* Layer 2: dot grid */
   body::after {
     content: '';
     position: fixed;
     inset: 0;
-    background-image: radial-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px);
-    background-size: 22px 22px;
+    background-image: radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    background-size: 24px 24px;
     z-index: -2;
     mask-image: radial-gradient(ellipse 90% 80% at 50% 30%, black 20%, transparent 90%);
     -webkit-mask-image: radial-gradient(ellipse 90% 80% at 50% 30%, black 20%, transparent 90%);
     pointer-events: none;
   }
 
-  /* === Floating orbs === */
-  .orbs {
+  /* Film grain */
+  .grain {
     position: fixed;
     inset: 0;
+    z-index: 9999;
     pointer-events: none;
-    z-index: -1;
-    overflow: hidden;
+    opacity: 0.035;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation: grainShift 8s steps(6) infinite;
   }
-  .orb {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(60px);
-    opacity: 0.35;
-    animation: float 22s ease-in-out infinite;
-  }
-  .orb-1 { top: 10%; left: 5%; width: 280px; height: 280px; background: var(--accent); animation-delay: 0s; }
-  .orb-2 { top: 60%; right: 8%; width: 320px; height: 320px; background: var(--accent-3); animation-delay: -8s; }
-  .orb-3 { bottom: 5%; left: 30%; width: 240px; height: 240px; background: var(--accent-2); animation-delay: -15s; }
-  @keyframes float {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    33% { transform: translate(40px, -30px) scale(1.1); }
-    66% { transform: translate(-30px, 40px) scale(0.95); }
+  @keyframes grainShift {
+    0% { transform: translate(0, 0); }
+    20% { transform: translate(-3%, 4%); }
+    40% { transform: translate(2%, -5%); }
+    60% { transform: translate(-4%, 2%); }
+    80% { transform: translate(3%, 3%); }
+    100% { transform: translate(0, 0); }
   }
 
   .card {
     position: relative;
-    background: linear-gradient(180deg, rgba(22, 28, 37, 0.85) 0%, rgba(16, 21, 28, 0.95) 100%);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    background: linear-gradient(180deg, rgba(22, 28, 37, 0.88) 0%, rgba(16, 21, 28, 0.96) 100%);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
     border: 1px solid var(--border);
-    border-radius: 18px;
-    padding: 34px 32px;
+    border-radius: 20px;
+    padding: 36px 34px;
     width: 100%;
-    max-width: 660px;
+    max-width: 680px;
     box-shadow:
       0 0 0 1px rgba(255, 255, 255, 0.02) inset,
       0 1px 0 rgba(255, 255, 255, 0.04) inset,
-      0 24px 60px rgba(0, 0, 0, 0.5),
-      0 0 120px rgba(16, 185, 129, 0.08);
+      0 30px 70px rgba(0, 0, 0, 0.55),
+      0 0 130px rgba(16, 185, 129, 0.08);
+    transform-style: preserve-3d;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     z-index: 1;
+    will-change: transform;
+  }
+  /* inner content wrapper untuk parallax tilt */
+  .card-inner {
+    transform: translateZ(30px);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    transform-style: preserve-3d;
   }
 
-  /* Rotating gradient border */
+  /* Rotating conic border */
   .card::before {
     content: '';
     position: absolute;
     inset: -1px;
-    border-radius: 18px;
+    border-radius: 20px;
     padding: 1px;
     background: conic-gradient(from var(--angle, 0deg),
       transparent 0deg,
-      rgba(16, 185, 129, 0.6) 40deg,
+      rgba(16, 185, 129, 0.5) 40deg,
       transparent 80deg,
       transparent 180deg,
-      rgba(139, 92, 246, 0.5) 220deg,
+      rgba(139, 92, 246, 0.4) 220deg,
       transparent 260deg,
       transparent 360deg);
     -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
-    animation: spinBorder 8s linear infinite;
+    animation: spinBorder 12s linear infinite;
     pointer-events: none;
-    opacity: 0.6;
+    opacity: 0.55;
   }
   @property --angle {
     syntax: '<angle>';
     initial-value: 0deg;
     inherits: false;
   }
-  @keyframes spinBorder {
-    to { --angle: 360deg; }
+  @keyframes spinBorder { to { --angle: 360deg; } }
+
+  /* Scanning line */
+  .card .scan {
+    position: absolute;
+    left: 0; right: 0;
+    top: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.5), transparent);
+    animation: scanY 8s ease-in-out infinite;
+    pointer-events: none;
+    opacity: 0.6;
+  }
+  @keyframes scanY {
+    0%, 100% { top: 8%; opacity: 0; }
+    50% { top: 92%; opacity: 0.6; }
   }
 
-  /* Corner pulse dot */
+  /* Corner dot */
   .card::after {
     content: '';
     position: absolute;
-    top: 14px;
-    right: 14px;
+    top: 16px;
+    right: 16px;
     width: 6px;
     height: 6px;
     border-radius: 50%;
@@ -171,6 +199,17 @@
   @keyframes blink {
     0%, 100% { opacity: 1; transform: scale(1); }
     50% { opacity: 0.4; transform: scale(0.85); }
+  }
+
+  /* Section reveal */
+  .reveal {
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .reveal.in {
+    opacity: 1;
+    transform: translateY(0);
   }
 
   .header {
@@ -188,21 +227,21 @@
     bottom: -1px;
     left: 0;
     height: 1px;
-    width: 80px;
+    width: 90px;
     background: linear-gradient(90deg, var(--accent), transparent);
     box-shadow: 0 0 12px var(--accent-glow);
   }
   .logo {
     flex-shrink: 0;
-    width: 44px;
-    height: 44px;
-    border-radius: 11px;
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
     background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(6, 182, 212, 0.15));
     border: 1px solid rgba(16, 185, 129, 0.3);
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 0 20px rgba(16, 185, 129, 0.15);
+    box-shadow: 0 0 24px rgba(16, 185, 129, 0.18);
     position: relative;
     overflow: hidden;
   }
@@ -210,26 +249,26 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.2) 50%, transparent 70%);
-    animation: shine 4s ease-in-out infinite;
+    background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.22) 50%, transparent 70%);
+    animation: shine 4.5s ease-in-out infinite;
   }
   @keyframes shine {
     0%, 100% { transform: translateX(-100%); }
     50% { transform: translateX(100%); }
   }
-  .logo svg { width: 26px; height: 26px; position: relative; z-index: 1; }
+  .logo svg { width: 27px; height: 27px; position: relative; z-index: 1; }
   .title-block { flex: 1; min-width: 0; }
   h1 {
-    font-size: 20px;
+    font-size: 21px;
     font-weight: 800;
-    letter-spacing: -0.02em;
-    margin-bottom: 3px;
+    letter-spacing: -0.025em;
+    margin-bottom: 4px;
     background: linear-gradient(90deg, #ffffff 0%, #a7f3d0 40%, #67e8f9 70%, #c4b5fd 100%);
     background-size: 200% 100%;
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: shimmerText 6s ease-in-out infinite;
+    animation: shimmerText 7s ease-in-out infinite;
   }
   @keyframes shimmerText {
     0%, 100% { background-position: 0% 50%; }
@@ -241,13 +280,13 @@
     font-weight: 500;
     display: flex;
     align-items: center;
-    gap: 7px;
+    gap: 8px;
   }
   .sub .badge {
-    padding: 1px 6px;
+    padding: 1px 7px;
     font-size: 9.5px;
     font-weight: 700;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--accent);
     background: var(--accent-soft);
@@ -257,7 +296,7 @@
   }
   @keyframes pulseBadge {
     0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
-    50% { box-shadow: 0 0 0 4px rgba(16, 185, 129, 0); }
+    50% { box-shadow: 0 0 0 5px rgba(16, 185, 129, 0); }
   }
 
   label {
@@ -284,8 +323,7 @@
   input:hover, select:hover, textarea:hover { border-color: #4a5460; }
   input:focus, select:focus, textarea:focus {
     border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-soft), 0 0 24px rgba(16, 185, 129, 0.18);
-    background: var(--bg);
+    box-shadow: 0 0 0 3px var(--accent-soft), 0 0 26px rgba(16, 185, 129, 0.2);
   }
   select {
     cursor: pointer;
@@ -333,7 +371,7 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(16, 185, 129, 0.08), transparent 40%);
+    background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(16, 185, 129, 0.09), transparent 45%);
     opacity: 0;
     transition: opacity 0.3s;
     pointer-events: none;
@@ -343,11 +381,11 @@
     border-color: rgba(16, 185, 129, 0.35);
     background: var(--surface-2);
     transform: translateX(2px);
-    box-shadow: 0 0 20px rgba(16, 185, 129, 0.1);
+    box-shadow: 0 0 22px rgba(16, 185, 129, 0.1);
   }
   .leg:hover::before {
     background: var(--accent);
-    box-shadow: 0 0 10px var(--accent-glow);
+    box-shadow: 0 0 12px var(--accent-glow);
   }
   .leg input.odds { flex: 1; min-width: 0; position: relative; z-index: 1; }
   .leg select.result-type { width: 140px; flex-shrink: 0; font-family: 'Inter', sans-serif; position: relative; z-index: 1; }
@@ -375,7 +413,6 @@
     position: relative;
     overflow: hidden;
   }
-  /* Ripple */
   button .ripple {
     position: absolute;
     border-radius: 50%;
@@ -396,6 +433,7 @@
     font-size: 14px;
     font-weight: 700;
     box-shadow: 0 4px 14px rgba(16, 185, 129, 0.25), 0 1px 0 rgba(255, 255, 255, 0.2) inset;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s;
   }
   .btn-primary::before {
     content: '';
@@ -407,10 +445,8 @@
   }
   .btn-primary:hover::before { left: 100%; }
   .btn-primary:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 8px 26px rgba(16, 185, 129, 0.45), 0 1px 0 rgba(255, 255, 255, 0.2) inset;
+    box-shadow: 0 8px 28px rgba(16, 185, 129, 0.5), 0 1px 0 rgba(255, 255, 255, 0.25) inset;
   }
-  .btn-primary:active { transform: translateY(0); }
   .btn-secondary {
     background: var(--surface-2);
     color: var(--text-dim);
@@ -441,17 +477,17 @@
   }
   .result {
     margin-top: 20px;
-    padding: 20px;
+    padding: 22px;
     background: var(--surface);
     border-radius: 12px;
     border: 1px solid var(--border);
     font-size: 14px;
     line-height: 1.7;
     position: relative;
-    animation: resultIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: resultIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
   }
   @keyframes resultIn {
-    from { opacity: 0; transform: translateY(8px); }
+    from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
   }
   .result::before {
@@ -462,7 +498,7 @@
     right: 20%;
     height: 1px;
     background: linear-gradient(90deg, transparent, var(--accent), transparent);
-    box-shadow: 0 0 12px var(--accent-glow);
+    box-shadow: 0 0 14px var(--accent-glow);
   }
   .breakdown {
     font-size: 12.5px;
@@ -470,9 +506,9 @@
     padding: 6px 0;
     border-bottom: 1px solid var(--border);
     font-family: 'JetBrains Mono', monospace;
-    transition: color 0.2s;
+    transition: color 0.2s, transform 0.2s;
   }
-  .breakdown:hover { color: var(--text-dim); }
+  .breakdown:hover { color: var(--text-dim); transform: translateX(3px); }
   .breakdown:last-of-type { border-bottom: none; }
   hr { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
   .row {
@@ -492,22 +528,23 @@
     font-weight: 800;
     color: var(--accent);
     letter-spacing: -0.01em;
-    text-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+    text-shadow: 0 0 22px rgba(16, 185, 129, 0.5);
     position: relative;
-    padding: 2px 8px;
+    padding: 3px 10px;
     border-radius: 6px;
-    background: linear-gradient(90deg, rgba(16, 185, 129, 0.08), transparent);
+    background: linear-gradient(90deg, rgba(16, 185, 129, 0.1), transparent);
     animation: totalGlow 3s ease-in-out infinite alternate;
+    display: inline-block;
   }
   @keyframes totalGlow {
-    from { text-shadow: 0 0 20px rgba(16, 185, 129, 0.3); }
-    to { text-shadow: 0 0 32px rgba(16, 185, 129, 0.7), 0 0 60px rgba(16, 185, 129, 0.3); }
+    from { text-shadow: 0 0 20px rgba(16, 185, 129, 0.35); }
+    to { text-shadow: 0 0 32px rgba(16, 185, 129, 0.75), 0 0 64px rgba(16, 185, 129, 0.35); }
   }
   .status-win { color: var(--accent); font-weight: 700; }
   .status-lose { color: var(--danger); font-weight: 700; }
   .saldo-panel {
     margin-top: 16px;
-    padding: 18px;
+    padding: 20px;
     border-radius: 12px;
     background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(16, 185, 129, 0.02) 100%);
     border: 1px solid rgba(16, 185, 129, 0.25);
@@ -517,7 +554,7 @@
   }
   @keyframes saldoGlow {
     from { box-shadow: 0 0 20px rgba(16, 185, 129, 0.1), inset 0 0 20px rgba(16, 185, 129, 0.03); }
-    to { box-shadow: 0 0 40px rgba(16, 185, 129, 0.25), inset 0 0 30px rgba(16, 185, 129, 0.06); }
+    to { box-shadow: 0 0 44px rgba(16, 185, 129, 0.28), inset 0 0 32px rgba(16, 185, 129, 0.06); }
   }
   .saldo-panel::before {
     content: '';
@@ -530,11 +567,9 @@
   .saldo-panel::after {
     content: '';
     position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: conic-gradient(from 0deg, transparent, rgba(16, 185, 129, 0.08), transparent 30%);
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: conic-gradient(from 0deg, transparent, rgba(16, 185, 129, 0.09), transparent 30%);
     animation: rotate 10s linear infinite;
     pointer-events: none;
   }
@@ -544,9 +579,7 @@
     border-color: rgba(248, 81, 73, 0.25);
     animation: none;
   }
-  .saldo-panel.lose::before {
-    background: linear-gradient(90deg, transparent, var(--danger), transparent);
-  }
+  .saldo-panel.lose::before { background: linear-gradient(90deg, transparent, var(--danger), transparent); }
   .saldo-panel.lose::after { display: none; }
   .saldo-label {
     font-size: 11.5px;
@@ -595,7 +628,7 @@
     color: var(--muted);
     margin-top: 20px;
     line-height: 1.8;
-    padding: 16px;
+    padding: 16px 16px 16px 20px;
     background: var(--surface);
     border-radius: 10px;
     border: 1px solid var(--border);
@@ -668,11 +701,12 @@
   }
   ::-webkit-scrollbar-thumb:hover { background: #4a5460; }
   @media (max-width: 520px) {
-    body { padding: 16px 12px; }
-    .card { padding: 22px 18px; border-radius: 14px; }
+    body { padding: 16px 12px; perspective: none; }
+    .card { padding: 22px 18px; border-radius: 16px; transform: none !important; }
+    .card-inner { transform: none !important; }
     .header { gap: 12px; }
-    .logo { width: 38px; height: 38px; }
-    .logo svg { width: 22px; height: 22px; }
+    .logo { width: 40px; height: 40px; }
+    .logo svg { width: 23px; height: 23px; }
     h1 { font-size: 17px; }
     .input-grid { grid-template-columns: 1fr; }
     .leg { flex-wrap: wrap; }
@@ -681,79 +715,83 @@
     .big { font-size: 18px; }
     .saldo-value { font-size: 22px; }
   }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+    .card { transform: none !important; }
+  }
 </style>
 </head>
 <body>
 
-<div class="orbs">
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-  <div class="orb orb-3"></div>
-</div>
+<canvas id="particles"></canvas>
+<div class="grain"></div>
 
-<div class="card">
-  <div class="header">
-    <div class="logo">
-      <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stop-color="#10b981"/>
-            <stop offset="1" stop-color="#06b6d4"/>
-          </linearGradient>
-        </defs>
-        <path d="M22 46V20h14a9 9 0 0 1 0 18h-7" fill="none" stroke="url(#lg)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-        <circle cx="42" cy="46" r="3.5" fill="#10b981"/>
-      </svg>
-    </div>
-    <div class="title-block">
-      <h1>Mix Parlay Calculator</h1>
-      <div class="sub">
-        <span class="badge">BETA</span>
-        <span>Auto-read odds &amp; status dari bill</span>
+<div class="card" id="card">
+  <div class="scan"></div>
+  <div class="card-inner">
+    <div class="header">
+      <div class="logo">
+        <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#10b981"/>
+              <stop offset="1" stop-color="#06b6d4"/>
+            </linearGradient>
+          </defs>
+          <path d="M22 46V20h14a9 9 0 0 1 0 18h-7" fill="none" stroke="url(#lg)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="42" cy="46" r="3.5" fill="#10b981"/>
+        </svg>
+      </div>
+      <div class="title-block">
+        <h1>Mix Parlay Calculator</h1>
+        <div class="sub">
+          <span class="badge">BETA</span>
+          <span>Auto-read odds &amp; status dari bill</span>
+        </div>
       </div>
     </div>
-  </div>
 
-  <div class="section">
-    <label>Paste Teks Bill Parlay</label>
-    <textarea id="pasteText" placeholder="Paste teks bill lu di sini... Contoh:&#10;&#10;1&#10;JAPAN EMPEROR CUP&#10;FC Machida Zelvia vs Tochigi City FC&#10;Type : Over/Under  Odds: 1.64&#10;Bet : FC Machida Zelvia Win&#10;@ 1.640&#10;&#10;Bet Amount : 322.00&#10;Odds : 5.912&#10;Est. /Payout: 1,903.66"></textarea>
-    <button class="btn-primary" onclick="applyPaste()">Parse &amp; Terapkan</button>
-    <div id="ocrStatus" class="ocr-status"></div>
-    <div class="paste-hint">
-      💡 Copy teks bill dari chat/catatan, paste di sini. Parser bakal cari odds + status (W / WH / D / LH / L) + stake + saldo.
+    <div class="section reveal">
+      <label>Paste Teks Bill Parlay</label>
+      <textarea id="pasteText" placeholder="Paste teks bill lu di sini... Contoh:&#10;&#10;1&#10;JAPAN EMPEROR CUP&#10;FC Machida Zelvia vs Tochigi City FC&#10;Type : Over/Under  Odds: 1.64&#10;Bet : FC Machida Zelvia Win&#10;@ 1.640&#10;&#10;Bet Amount : 322.00&#10;Odds : 5.912&#10;Est. /Payout: 1,903.66"></textarea>
+      <button class="btn-primary magnetic" onclick="applyPaste()">Parse &amp; Terapkan</button>
+      <div id="ocrStatus" class="ocr-status"></div>
+      <div class="paste-hint">
+        💡 Copy teks bill dari chat/catatan, paste di sini. Parser bakal cari odds + status (W / WH / D / LH / L) + stake + saldo.
+      </div>
     </div>
-  </div>
 
-  <div class="input-grid section">
-    <div>
-      <label for="saldoAwal">Saldo Awal</label>
-      <input type="number" id="saldoAwal" value="322" min="0" step="any">
+    <div class="input-grid section reveal">
+      <div>
+        <label for="saldoAwal">Saldo Awal</label>
+        <input type="number" id="saldoAwal" value="322" min="0" step="any">
+      </div>
+      <div>
+        <label for="stake">Nilai Taruhan</label>
+        <input type="number" id="stake" value="322" min="0" step="any">
+      </div>
     </div>
-    <div>
-      <label for="stake">Nilai Taruhan</label>
-      <input type="number" id="stake" value="322" min="0" step="any">
+
+    <div class="section reveal">
+      <label>Daftar Pilihan (Odds &amp; Hasil)</label>
+      <div id="legs"></div>
+      <button class="btn-secondary" onclick="addLeg()">+ Tambah Pilihan</button>
     </div>
-  </div>
 
-  <div class="section">
-    <label>Daftar Pilihan (Odds &amp; Hasil)</label>
-    <div id="legs"></div>
-    <button class="btn-secondary" onclick="addLeg()">+ Tambah Pilihan</button>
-  </div>
+    <button class="btn-primary magnetic reveal" onclick="calculate()">Hitung Hasil</button>
+    <div id="result" class="result">Hasil perhitungan bakal muncul di sini.</div>
 
-  <button class="btn-primary" onclick="calculate()">Hitung Hasil</button>
-  <div id="result" class="result">Hasil perhitungan bakal muncul di sini.</div>
-
-  <div class="hint">
-    <b>Panduan Singkat</b><br>
-    • <b>W</b> — menang penuh, odds tidak berubah<br>
-    • <b>WH</b> — menang separuh, nilai odds jadi <code>(odds − 1) ÷ 2 + 1</code><br>
-    • <b>D</b> — seri, odds dianggap <code>1</code><br>
-    • <b>LH</b> — kalah separuh, odds dianggap <code>0.5</code><br>
-    • <b>L</b> — kalah penuh, seluruh kombinasi dianggap gugur<br><br>
-    <b>Rumus Mix Parlay</b><br>
-    <code>(Total Odds × Nilai Taruhan) − Nilai Taruhan</code><br>
-    <b>Saldo Efektif</b> = Saldo Awal − Taruhan + Nilai Kembali
+    <div class="hint reveal">
+      <b>Panduan Singkat</b><br>
+      • <b>W</b> — menang penuh, odds tidak berubah<br>
+      • <b>WH</b> — menang separuh, nilai odds jadi <code>(odds − 1) ÷ 2 + 1</code><br>
+      • <b>D</b> — seri, odds dianggap <code>1</code><br>
+      • <b>LH</b> — kalah separuh, odds dianggap <code>0.5</code><br>
+      • <b>L</b> — kalah penuh, seluruh kombinasi dianggap gugur<br><br>
+      <b>Rumus Mix Parlay</b><br>
+      <code>(Total Odds × Nilai Taruhan) − Nilai Taruhan</code><br>
+      <b>Saldo Efektif</b> = Saldo Awal − Taruhan + Nilai Kembali
+    </div>
   </div>
 </div>
 
@@ -762,7 +800,135 @@
   const ocrStatus = document.getElementById('ocrStatus');
   const legsContainer = document.getElementById('legs');
 
-  /* === RIPPLE EFFECT === */
+  /* ============================================================
+     PARTICLE NETWORK BACKGROUND
+  ============================================================ */
+  (function() {
+    const canvas = document.getElementById('particles');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let W, H;
+    const DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+    function resize() {
+      W = canvas.width = window.innerWidth * DPR;
+      H = canvas.height = window.innerHeight * DPR;
+      canvas.style.width = window.innerWidth + 'px';
+      canvas.style.height = window.innerHeight + 'px';
+      const count = Math.min(Math.floor((window.innerWidth * window.innerHeight) / 22000), 90);
+      particles = [];
+      for (let i = 0; i < count; i++) {
+        particles.push({
+          x: Math.random() * W,
+          y: Math.random() * H,
+          vx: (Math.random() - 0.5) * 0.3 * DPR,
+          vy: (Math.random() - 0.5) * 0.3 * DPR,
+          r: (Math.random() * 1.2 + 0.4) * DPR
+        });
+      }
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      const linkDist = 130 * DPR;
+
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.x < 0 || p.x > W) p.vx *= -1;
+        if (p.y < 0 || p.y > H) p.vy *= -1;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(16, 185, 129, 0.55)';
+        ctx.fill();
+      }
+
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const d = Math.sqrt(dx * dx + dy * dy);
+          if (d < linkDist) {
+            const alpha = (1 - d / linkDist) * 0.15;
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.strokeStyle = `rgba(16, 185, 129, ${alpha})`;
+            ctx.lineWidth = 0.6 * DPR;
+            ctx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(draw);
+    }
+
+    window.addEventListener('resize', resize);
+    resize();
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      draw();
+    }
+  })();
+
+  /* ============================================================
+     CARD 3D TILT (desktop only)
+  ============================================================ */
+  (function() {
+    const card = document.getElementById('card');
+    const inner = card.querySelector('.card-inner');
+    if (window.matchMedia('(pointer: coarse)').matches) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    let raf = null;
+    let targetRX = 0, targetRY = 0, curRX = 0, curRY = 0;
+
+    function loop() {
+      curRX += (targetRX - curRX) * 0.12;
+      curRY += (targetRY - curRY) * 0.12;
+      card.style.transform = `rotateX(${curRX}deg) rotateY(${curRY}deg)`;
+      raf = requestAnimationFrame(loop);
+    }
+
+    document.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const dx = (e.clientX - cx) / rect.width;
+      const dy = (e.clientY - cy) / rect.height;
+      targetRY = dx * 3;   // max 3 deg
+      targetRX = -dy * 3;
+    });
+
+    document.addEventListener('mouseleave', () => {
+      targetRX = 0;
+      targetRY = 0;
+    });
+
+    loop();
+  })();
+
+  /* ============================================================
+     MAGNETIC BUTTONS
+  ============================================================ */
+  (function() {
+    if (window.matchMedia('(pointer: coarse)').matches) return;
+    document.querySelectorAll('.magnetic').forEach(btn => {
+      btn.addEventListener('mousemove', (e) => {
+        const r = btn.getBoundingClientRect();
+        const dx = e.clientX - (r.left + r.width / 2);
+        const dy = e.clientY - (r.top + r.height / 2);
+        btn.style.transform = `translate(${dx * 0.08}px, ${dy * 0.15}px)`;
+      });
+      btn.addEventListener('mouseleave', () => {
+        btn.style.transform = '';
+      });
+    });
+  })();
+
+  /* ============================================================
+     RIPPLE EFFECT
+  ============================================================ */
   document.addEventListener('click', (e) => {
     const btn = e.target.closest('button');
     if (!btn) return;
@@ -779,7 +945,9 @@
     setTimeout(() => ripple.remove(), 600);
   });
 
-  /* === MOUSE-FOLLOW GLOW DI LEG === */
+  /* ============================================================
+     MOUSE-FOLLOW GLOW on LEG
+  ============================================================ */
   document.addEventListener('mousemove', (e) => {
     const leg = e.target.closest('.leg');
     if (!leg) return;
@@ -788,11 +956,33 @@
     leg.style.setProperty('--my', ((e.clientY - rect.top) / rect.height * 100) + '%');
   });
 
+  /* ============================================================
+     SECTION REVEAL
+  ============================================================ */
+  (function() {
+    const els = document.querySelectorAll('.reveal');
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(en => {
+        if (en.isIntersecting) {
+          en.target.classList.add('in');
+          io.unobserve(en.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    els.forEach(el => io.observe(el));
+  })();
+
+  /* ============================================================
+     STATUS
+  ============================================================ */
   function setStatus(msg, type = 'info') {
     ocrStatus.innerHTML = msg;
     ocrStatus.className = 'ocr-status show ' + type;
   }
 
+  /* ============================================================
+     PARSER
+  ============================================================ */
   function parseBill(text) {
     const rawLines = text
       .replace(/\r/g, '')
@@ -996,9 +1186,10 @@
     });
   }
 
-  // === ANIMATED COUNT-UP ===
-  function animateNumber(el, target, decimals = 2, duration = 700) {
-    const start = 0;
+  /* ============================================================
+     ANIMATED COUNT-UP
+  ============================================================ */
+  function animateNumber(el, target, decimals = 2, duration = 800) {
     const startTime = performance.now();
     const formatter = (v) => v.toLocaleString('en-US', {
       minimumFractionDigits: decimals,
@@ -1006,9 +1197,8 @@
     });
     function tick(now) {
       const p = Math.min((now - startTime) / duration, 1);
-      // easeOutExpo
-      const eased = p === 1 ? 1 : 1 - Math.pow(2, -10 * p);
-      const v = start + (target - start) * eased;
+      const eased = p === 1 ? 1 : 1 - Math.pow(2, -10 * p); // easeOutExpo
+      const v = target * eased;
       el.textContent = formatter(v);
       if (p < 1) requestAnimationFrame(tick);
       else el.textContent = formatter(target);
@@ -1016,6 +1206,9 @@
     requestAnimationFrame(tick);
   }
 
+  /* ============================================================
+     CALCULATE
+  ============================================================ */
   function calculate() {
     const saldoAwal = parseFloat(document.getElementById('saldoAwal').value) || 0;
     const stake = parseFloat(document.getElementById('stake').value) || 0;
@@ -1044,6 +1237,10 @@
 
     if (!valid) { result.innerHTML = 'Pastikan semua odds diisi angka ≥ 1.00 ya bre.'; return; }
 
+    // === FIX: Round total odds ke 3 desimal DULU, baru dikali stake ===
+    // Biar konsisten sama display & hasil kalkulator
+    const roundedTotalOdds = Math.round(totalOdds * 1000) / 1000;
+
     if (anyLose) {
       const saldoAkhir = saldoAwal - stake;
       result.innerHTML = `
@@ -1062,7 +1259,7 @@
       return;
     }
 
-    const grossReturn = stake * totalOdds;
+    const grossReturn = stake * roundedTotalOdds;
     const netResult = grossReturn - stake;
     const isWin = netResult >= 0;
     const saldoAkhir = saldoAwal - stake + grossReturn;
@@ -1085,18 +1282,17 @@
       </div>
     `;
 
-    // Animate numbers
-    animateNumber(document.getElementById('animTotalOdds'), totalOdds, 3);
+    animateNumber(document.getElementById('animTotalOdds'), roundedTotalOdds, 3);
     setTimeout(() => {
-      const grossEl = document.getElementById('animGross');
-      animateNumber(grossEl, grossReturn, 2);
-      grossEl.textContent = '+' + grossEl.textContent;
+      const g = document.getElementById('animGross');
+      animateNumber(g, grossReturn, 2);
+      setTimeout(() => { g.textContent = '+' + g.textContent; }, 850);
     }, 150);
     setTimeout(() => animateNumber(document.getElementById('animSaldoAkhir'), saldoAkhir, 2), 300);
     setTimeout(() => {
-      const netEl = document.getElementById('animNet');
-      animateNumber(netEl, Math.abs(netResult), 2);
-      netEl.textContent = (isWin ? '+' : '−') + netEl.textContent;
+      const n = document.getElementById('animNet');
+      animateNumber(n, Math.abs(netResult), 2);
+      setTimeout(() => { n.textContent = (isWin ? '+' : '−') + n.textContent; }, 850);
     }, 450);
   }
 
