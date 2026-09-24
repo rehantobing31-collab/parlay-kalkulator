@@ -48,6 +48,7 @@
     overflow-x: hidden;
   }
 
+  /* Aurora background */
   body::before {
     content: '';
     position: fixed;
@@ -66,6 +67,7 @@
     100% { transform: translate(-2%, 3%) scale(1.02); }
   }
 
+  /* Particle canvas */
   #particles {
     position: fixed;
     inset: 0;
@@ -74,6 +76,7 @@
     opacity: 0.55;
   }
 
+  /* Dot grid */
   body::after {
     content: '';
     position: fixed;
@@ -86,6 +89,7 @@
     pointer-events: none;
   }
 
+  /* Film grain */
   .grain {
     position: fixed;
     inset: 0;
@@ -105,6 +109,7 @@
     100% { transform: translate(0, 0); }
   }
 
+  /* Card */
   .card {
     position: relative;
     background: linear-gradient(180deg, rgba(22, 28, 37, 0.88) 0%, rgba(16, 21, 28, 0.96) 100%);
@@ -124,6 +129,7 @@
     overflow: hidden;
   }
 
+  /* Rotating conic border */
   .card::before {
     content: '';
     position: absolute;
@@ -149,6 +155,26 @@
   @property --angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
   @keyframes spinBorder { to { --angle: 360deg; } }
 
+  /* Scan line */
+  .card .scan {
+    position: absolute;
+    left: 0; right: 0;
+    top: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.55), transparent);
+    animation: scanY 9s ease-in-out infinite;
+    pointer-events: none;
+    opacity: 0.5;
+    z-index: 3;
+  }
+  @keyframes scanY {
+    0%, 100% { top: 4%; opacity: 0; }
+    50% { top: 96%; opacity: 0.5; }
+  }
+
+  /* ============================================================
+     HERO HEADER
+  ============================================================ */
   .hero {
     position: relative;
     padding: 36px 36px 28px;
@@ -253,6 +279,7 @@
     50% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
   }
 
+  /* Live stats bar */
   .live-bar {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -296,22 +323,52 @@
   }
   .live-chip-value.accent { color: var(--accent); text-shadow: 0 0 14px rgba(16, 185, 129, 0.4); }
 
-  .card .scan {
-    position: absolute;
-    left: 0; right: 0;
-    top: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.55), transparent);
-    animation: scanY 9s ease-in-out infinite;
-    pointer-events: none;
-    opacity: 0.5;
-    z-index: 3;
+  /* ============================================================
+     NOTICE BANNER
+  ============================================================ */
+  .notice {
+    margin: 20px 36px 0;
+    padding: 14px 16px;
+    background: linear-gradient(135deg, rgba(227, 179, 65, 0.1) 0%, rgba(227, 179, 65, 0.03) 100%);
+    border: 1px solid rgba(227, 179, 65, 0.3);
+    border-left: 3px solid var(--warn);
+    border-radius: 12px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    position: relative;
+    z-index: 1;
   }
-  @keyframes scanY {
-    0%, 100% { top: 4%; opacity: 0; }
-    50% { top: 96%; opacity: 0.5; }
+  .notice-icon {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 7px;
+    background: var(--warn-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+  }
+  .notice-icon svg { width: 14px; height: 14px; color: var(--warn); }
+  .notice-body { flex: 1; min-width: 0; }
+  .notice-title {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--warn);
+    margin-bottom: 4px;
+  }
+  .notice-text {
+    font-size: 12.5px;
+    color: var(--text-dim);
+    line-height: 1.55;
   }
 
+  /* ============================================================
+     BODY CONTENT
+  ============================================================ */
   .body-content {
     padding: 28px 36px 36px;
   }
@@ -366,6 +423,7 @@
   }
   .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 
+  /* Legs */
   .legs-header {
     display: flex;
     justify-content: space-between;
@@ -442,6 +500,7 @@
     color: var(--danger);
   }
 
+  /* Buttons */
   button {
     cursor: pointer;
     border: none;
@@ -521,6 +580,7 @@
     background: var(--danger-soft);
   }
 
+  /* Result */
   .result {
     margin-top: 22px;
     background: var(--surface);
@@ -834,6 +894,8 @@
     .hero h1 { font-size: 20px; }
     .logo { width: 46px; height: 46px; }
     .logo svg { width: 26px; height: 26px; }
+    .notice { margin: 16px 20px 0; padding: 12px 14px; }
+    .notice-text { font-size: 12px; }
     .body-content { padding: 20px 20px 24px; }
     .live-bar { grid-template-columns: repeat(3, 1fr); gap: 6px; }
     .live-chip { padding: 9px 10px; }
@@ -859,6 +921,7 @@
 <div class="card" id="card">
   <div class="scan"></div>
 
+  <!-- HERO HEADER -->
   <div class="hero">
     <div class="hero-top">
       <div class="logo">
@@ -898,9 +961,28 @@
     </div>
   </div>
 
+  <!-- NOTICE BANNER -->
+  <div class="notice">
+    <div class="notice-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+        <line x1="12" y1="9" x2="12" y2="13"/>
+        <line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+    </div>
+    <div class="notice-body">
+      <div class="notice-title">Perhatian</div>
+      <div class="notice-text">
+        Hasil perhitungan dapat berbeda bergantung pada jenis situs yang digunakan. Mohon isi data secara manual agar hasil yang diperoleh lebih akurat.
+      </div>
+    </div>
+  </div>
+
+  <!-- BODY -->
   <div class="body-content">
 
-    <div class="section" style="margin-top: 0;">
+    <!-- PASTE SECTION -->
+    <div class="section" style="margin-top: 20px;">
       <label>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6a2 2 0 0 1 2 2v2h2a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h2V4a2 2 0 0 1 2-2z"/><path d="M9 12h6M9 16h6"/></svg>
         Paste Teks Bill Parlay
@@ -916,6 +998,7 @@
       </div>
     </div>
 
+    <!-- SALDO & STAKE -->
     <div class="input-grid section">
       <div>
         <label for="saldoAwal">
@@ -933,6 +1016,7 @@
       </div>
     </div>
 
+    <!-- LEGS -->
     <div class="section">
       <div class="legs-header">
         <label style="margin-bottom: 0;">
@@ -948,6 +1032,7 @@
       </button>
     </div>
 
+    <!-- HITUNG -->
     <button type="button" class="btn-primary" onclick="calculate()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
       Hitung Hasil
@@ -1044,7 +1129,7 @@
   })();
 
   /* ============================================================
-     RIPPLE (event delegation, aman)
+     RIPPLE
   ============================================================ */
   document.addEventListener('click', (e) => {
     const btn = e.target.closest('button');
