@@ -179,7 +179,6 @@
       <div class="tab" data-tab="paste" onclick="switchTab('paste')">📋 Paste Teks</div>
     </div>
 
-    <!-- TAB OCR -->
     <div id="tab-ocr" class="tab-content active">
       <div id="dropZone" class="drop-zone">
         <input type="file" id="fileInput" accept="image/*" hidden>
@@ -213,12 +212,11 @@
       </div>
     </div>
 
-    <!-- TAB PASTE -->
     <div id="tab-paste" class="tab-content">
-      <textarea id="pasteText" placeholder="Paste teks bill lu di sini... Contoh:&#10;&#10;JAPAN EMPEROR CUP&#10;FC Machida Zelvia vs Tochigi City FC&#10;Type : Over/Under  Odds: 1.64&#10;Bet : FC Machida Zelvia Win&#10;@ 1.640&#10;&#10;Bet Amount : 104.00"></textarea>
+      <textarea id="pasteText" placeholder="Paste teks bill lu di sini..."></textarea>
       <button class="btn-primary" onclick="applyPaste()">Parse &amp; Terapkan</button>
       <div class="paste-hint">
-        💡 Copy teks dari bill chat / catatan, paste di sini. Parser bakal cari angka <code>Odds: X.XX</code> atau <code>@ X.XXX</code>.
+        💡 Copy teks dari bill chat / catatan, paste di sini. Parser bakal cari angka <code>@ X.XXX</code> atau <code>Odds: X.XX</code>.
       </div>
     </div>
   </div>
@@ -230,7 +228,7 @@
     </div>
     <div>
       <label for="stake">Nilai Taruhan</label>
-      <input type="number" id="stake" value="104" min="0" step="any">
+      <input type="number" id="stake" value="100" min="0" step="any">
     </div>
   </div>
 
@@ -263,7 +261,7 @@
     document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === 'tab-' + name));
   }
 
-  /* ============ OCR + PARSER ============ */
+  /* ============ OCR ============ */
   const dropZone = document.getElementById('dropZone');
   const fileInput = document.getElementById('fileInput');
   const previewWrap = document.getElementById('previewWrap');
@@ -300,12 +298,10 @@
     if (files && files[0]) handleFile(files[0]);
   });
 
-  // === PREPROCESS IMAGE (scale + grayscale + contrast) ===
   function preprocessImage(file) {
     return new Promise((resolve, reject) => {
       const img = new Image();
       img.onload = () => {
-        // Scale up 2x kalau gambar kecil, biar OCR lebih akurat
         const scale = img.width < 1200 ? 2 : 1.5;
         const canvas = document.createElement('canvas');
         canvas.width = Math.round(img.width * scale);
@@ -363,7 +359,6 @@
     setStatus('Sedang preprocess & membaca gambar. Proses ini 5–40 detik.', 'info');
 
     try {
-      // Preprocess dulu
       progressText.textContent = 'Preprocess gambar...';
       const processed = await preprocessImage(currentFile);
 
@@ -399,7 +394,6 @@
     }
   }
 
-  // === TERAPKAN HASIL PARSER ===
   function applyParsed(parsed, source) {
     if (parsed.odds.length > 0) {
       legsContainer.innerHTML = '';
@@ -420,7 +414,8 @@
   }
 
   /* ============================================================
-     PARSER — dengan SMART RECOVERY untuk titik desimal yang hilang
+     PARSER v3 — handle footer (Ref No, Date, Odds total, Payout)
+     + support duplikat odds (leg 5 & 7 sama-sama 1.48)
   ============================================================ */
   function parseBill(text) {
     const lines = text
@@ -430,33 +425,34 @@
       .filter(Boolean);
 
     const oddsFound = [];
-    const seen = new Set();
 
-    const addOdds = (v) => {
-      if (v < 1.01 || v > 100) return;
-      const key = v.toFixed(2);
-      if (seen.has(key)) return;
-      seen.add(key);
-      oddsFound.push(v);
+    // Skip baris header/footer — BUKAN bagian leg
+    const skipLine = (line) => {
+      return /ref\s*no|date\s*\/\s*time|game\s*type|bet\s*amount|est\.?\s*\/?\s*payout|payout|stake\s*[:=]|taruhan\s*[:=]|total\s*bet|result\s*[:=]/i.test(line);
     };
 
-    // PASS 1 — "@ X.XXX" atau "@XXXX" (recovery tanpa titik)
+    // PASS 1 — "@ X.XXX" (paling reliable)
     for (const line of lines) {
+      if (skipLine(line)) continue;
       const mAt = line.match(/@\s*([\d.,]+)/);
       if (mAt) {
         const v = smartParseOdds(mAt[1]);
-        if (v) addOdds(v);
+        if (v) oddsFound.push(v);
       }
     }
 
-    // PASS 2 — "Odds: X.XX" atau "Odds: XXX" (recovery)
-    for (const line of lines) {
-      if (/result\s*[:=]/i.test(line)) continue;
-      if (/bet\s*amount|stake|taruhan|total\s*bet/i.test(line)) continue;
-      const mOdds = line.match(/odds?\s*[:=]?\s*([\d.,]+)/i);
-      if (mOdds) {
-        const v = smartParseOdds(mOdds[1]);
-        if (v) addOdds(v);
+    // PASS 2 — Fallback: baris yang punya konteks "Type/1X2/Over-Under/Handicap"
+    // Biar "Odds : 7.319" di footer ga ke-parse
+    if (oddsFound.length === 0) {
+      for (const line of lines) {
+        if (skipLine(line)) continue;
+        const hasContext = /type\s*[:=]|over\s*\/\s*under|handicap|1x2|asian/i.test(line);
+        if (!hasContext) continue;
+        const mOdds = line.match(/odds?\s*[:=]?\s*([\d.,]+)/i);
+        if (mOdds) {
+          const v = smartParseOdds(mOdds[1]);
+          if (v) oddsFound.push(v);
+        }
       }
     }
 
@@ -478,36 +474,22 @@
     return { odds: oddsFound, stake };
   }
 
-  // === SMART ODDS PARSER ===
-  // Kalau ada titik/koma → parse normal.
-  // Kalau ga ada (OCR ilangin) → coba recover dengan asumsi format 1.XX
   function smartParseOdds(raw) {
     let s = String(raw).trim().replace(/[^\d.,]/g, '');
     if (!s) return null;
-
-    // Case 1: Ada separator
     if (/[.,]/.test(s)) {
-      // Kalau ada >1 separator (thousand sep), skip karena kemungkinan bukan odds
       const sepCount = (s.match(/[.,]/g) || []).length;
       if (sepCount > 1) return null;
       const v = parseFloat(s.replace(',', '.'));
       if (v >= 1.01 && v <= 100) return v;
       return null;
     }
-
-    // Case 2: Tidak ada separator — OCR kemungkinan ilangin titiknya
     const digits = s.replace(/\D/g, '');
     if (digits.length < 2 || digits.length > 5) return null;
-
-    // Interpretasi: "164" → 1.64, "1640" → 1.640, "15" → 1.5
-    // Asumsi: digit pertama = integer part (biasanya 1-9 untuk odds)
     const intPart = digits[0];
     const decPart = digits.slice(1);
     const guess = parseFloat(intPart + '.' + decPart);
-
-    // Sanity check: odds harus 1.01 - 100
     if (guess >= 1.01 && guess <= 100) return guess;
-
     return null;
   }
 
@@ -545,7 +527,7 @@
     if (!text.trim()) { setStatus('Teks masih kosong, bre.', 'error'); return; }
     const parsed = parseBill(text);
     applyParsed(parsed, 'Dari teks paste');
-    switchTab('ocr'); // balik ke tab OCR biar keliatan hasilnya
+    switchTab('ocr');
   }
 
   /* ============ KALKULATOR PARLAY ============ */
