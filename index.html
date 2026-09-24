@@ -308,7 +308,7 @@
 
 <script>
   /* ============================================================
-     OCR + PARSER (context-aware)
+     OCR + PARSER
   ============================================================ */
   const dropZone = document.getElementById('dropZone');
   const fileInput = document.getElementById('fileInput');
@@ -436,11 +436,11 @@
   }
 
   /* ============================================================
-     PARSER CONTEXT-AWARE
-     Strategi: baca per baris, prioritaskan keyword "Odds:" dan "@"
-     Skip baris waktu/tanggal/skor/keyword stake.
+     PARSER CONTEXT-AWARE (v2)
+     Strategi:
+     - PASS 1: Ambil dari pola "@ X.XXX" (paling reliable)
+     - PASS 2: Fallback ke "Odds : X.XX" HANYA kalau ada desimal
   ============================================================ */
-
   function parseBill(text) {
     const lines = text
       .replace(/\r/g, '')
@@ -448,7 +448,7 @@
       .map(l => l.replace(/[^\x20-\x7E]/g, ' ').replace(/\s+/g, ' ').trim())
       .filter(Boolean);
 
-    const oddsFound = [];       // { v, priority }
+    const oddsFound = [];
     const seen = new Set();
 
     const addOdds = (v) => {
@@ -459,42 +459,29 @@
       oddsFound.push(v);
     };
 
+    // PASS 1 — Prioritas utama: pola "@ X.XXX"
     for (const line of lines) {
-      const lower = line.toLowerCase();
-
-      // 1. Skip baris waktu / tanggal (23/09 16:00)
-      const isDateLine = /\d{1,2}\s*[\/\-]\s*\d{1,2}/.test(line) && /\d{1,2}[:.]\d{2}/.test(line);
-      if (isDateLine) continue;
-      if (/^\d{1,2}[:.]\d{2}(\s|$)/.test(line)) continue;
-
-      // 2. Skip baris "Result : X - Y" (skor)
-      if (/result\s*[:=]/i.test(line)) continue;
-
-      // 3. Skip baris "Bet Amount", "Stake", "Total"
-      if (/bet\s*amount|stake|taruhan|total\s*bet/i.test(line)) continue;
-
-      // 4. Prioritas 1: "Odds : X.XX" atau "Odds: X.XX" atau "Odds X.XX"
-      const mOdds = line.match(/odds?\s*[:=]?\s*(\d{1,2}(?:[.,]\d{1,3})?)\b/i);
-      if (mOdds) {
-        const v = parseFloat(mOdds[1].replace(',', '.'));
-        if (v >= 1.01 && v <= 100) {
-          addOdds(v);
-          continue;
-        }
-      }
-
-      // 5. Prioritas 2: "@ X.XXX" (biasanya di akhir baris)
-      const mAt = line.match(/@\s*(\d{1,2}(?:[.,]\d{1,3})?)\b/);
+      const mAt = line.match(/@\s*(\d{1,2}[.,]\d{1,3})\b/);
       if (mAt) {
         const v = parseFloat(mAt[1].replace(',', '.'));
-        if (v >= 1.01 && v <= 100) {
+        addOdds(v);
+      }
+    }
+
+    // PASS 2 — Fallback: pola "Odds : X.XX" — WAJIB ada desimal
+    if (oddsFound.length === 0) {
+      for (const line of lines) {
+        if (/result\s*[:=]/i.test(line)) continue;
+        if (/bet\s*amount|stake|taruhan|total\s*bet/i.test(line)) continue;
+        const mOdds = line.match(/odds?\s*[:=]?\s*(\d{1,2}[.,]\d{1,3})\b/i);
+        if (mOdds) {
+          const v = parseFloat(mOdds[1].replace(',', '.'));
           addOdds(v);
-          continue;
         }
       }
     }
 
-    // Stake: cari "Bet Amount : X" / "Stake : X" / "Rp X" / "IDR X"
+    // Stake dari keyword
     let stake = null;
     const stakePatterns = [
       /bet\s*amount\s*[:=]?\s*([\d.,]+)/i,
@@ -512,7 +499,6 @@
     return { odds: oddsFound, stake };
   }
 
-  // Parse angka format Indonesia/US dengan deteksi desimal vs thousand separator
   function parseAmount(str) {
     let s = String(str).trim();
     if (!s) return 0;
@@ -535,7 +521,6 @@
       return parseFloat(s.replace(',', '.')) || 0;
     }
 
-    // Keduanya ada: yang terakhir = desimal
     if (s.lastIndexOf('.') > s.lastIndexOf(',')) {
       return parseFloat(s.replace(/,/g, '')) || 0;
     }
