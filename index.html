@@ -13,7 +13,6 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
     --bg: #0a0e14;
-    --bg-soft: #10151c;
     --surface: #161c25;
     --surface-2: #1c242f;
     --border: #232b36;
@@ -47,10 +46,8 @@
     -webkit-font-smoothing: antialiased;
     position: relative;
     overflow-x: hidden;
-    perspective: 1600px;
   }
 
-  /* Aurora */
   body::before {
     content: '';
     position: fixed;
@@ -69,7 +66,13 @@
     100% { transform: translate(-2%, 3%) scale(1.02); }
   }
 
-  #particles { position: fixed; inset: 0; z-index: -3; pointer-events: none; opacity: 0.55; }
+  #particles {
+    position: fixed;
+    inset: 0;
+    z-index: -3;
+    pointer-events: none;
+    opacity: 0.55;
+  }
 
   body::after {
     content: '';
@@ -117,16 +120,8 @@
       0 1px 0 rgba(255, 255, 255, 0.04) inset,
       0 30px 80px rgba(0, 0, 0, 0.6),
       0 0 140px rgba(16, 185, 129, 0.09);
-    transform-style: preserve-3d;
-    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     z-index: 1;
-    will-change: transform;
     overflow: hidden;
-  }
-  .card-inner {
-    transform: translateZ(30px);
-    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    transform-style: preserve-3d;
   }
 
   .card::before {
@@ -154,9 +149,6 @@
   @property --angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
   @keyframes spinBorder { to { --angle: 360deg; } }
 
-  /* ============================================================
-     HERO HEADER
-  ============================================================ */
   .hero {
     position: relative;
     padding: 36px 36px 28px;
@@ -261,7 +253,6 @@
     50% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
   }
 
-  /* LIVE STATS BAR */
   .live-bar {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -279,7 +270,6 @@
     gap: 4px;
     position: relative;
     overflow: hidden;
-    transition: border-color 0.2s;
   }
   .live-chip::before {
     content: '';
@@ -306,7 +296,6 @@
   }
   .live-chip-value.accent { color: var(--accent); text-shadow: 0 0 14px rgba(16, 185, 129, 0.4); }
 
-  /* SCAN LINE */
   .card .scan {
     position: absolute;
     left: 0; right: 0;
@@ -323,7 +312,6 @@
     50% { top: 96%; opacity: 0.5; }
   }
 
-  /* BODY */
   .body-content {
     padding: 28px 36px 36px;
   }
@@ -351,7 +339,7 @@
     font-weight: 500;
     font-family: 'JetBrains Mono', 'Courier New', monospace;
     outline: none;
-    transition: all 0.18s ease;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease;
     width: 100%;
   }
   input:hover, select:hover, textarea:hover { border-color: #4a5460; }
@@ -378,7 +366,6 @@
   }
   .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 
-  /* LEGS */
   .legs-header {
     display: flex;
     justify-content: space-between;
@@ -405,7 +392,7 @@
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 12px;
-    transition: all 0.2s;
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
     position: relative;
     overflow: hidden;
   }
@@ -419,20 +406,9 @@
     background: var(--border-soft);
     transition: background 0.25s, box-shadow 0.25s;
   }
-  .leg::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(16, 185, 129, 0.09), transparent 45%);
-    opacity: 0;
-    transition: opacity 0.3s;
-    pointer-events: none;
-  }
-  .leg:hover::after { opacity: 1; }
   .leg:hover {
     border-color: rgba(16, 185, 129, 0.4);
     background: var(--surface-2);
-    transform: translateX(2px);
     box-shadow: 0 0 24px rgba(16, 185, 129, 0.12);
   }
   .leg:hover::before { background: var(--accent); box-shadow: 0 0 14px var(--accent-glow); }
@@ -451,11 +427,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    position: relative;
-    z-index: 1;
   }
-  .leg input.odds { flex: 1; min-width: 0; position: relative; z-index: 1; }
-  .leg select.result-type { width: 140px; flex-shrink: 0; font-family: 'Inter', sans-serif; position: relative; z-index: 1; }
+  .leg input.odds { flex: 1; min-width: 0; }
+  .leg select.result-type { width: 140px; flex-shrink: 0; font-family: 'Inter', sans-serif; }
   .leg select.result-type[data-status="LH"],
   .leg select.result-type[data-status="WH"] {
     border-color: var(--warn);
@@ -468,7 +442,6 @@
     color: var(--danger);
   }
 
-  /* BUTTONS */
   button {
     cursor: pointer;
     border: none;
@@ -478,7 +451,7 @@
     font-size: 13.5px;
     font-family: 'Inter', sans-serif;
     letter-spacing: 0.01em;
-    transition: all 0.15s ease;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
     position: relative;
     overflow: hidden;
   }
@@ -502,25 +475,18 @@
     font-weight: 700;
     box-shadow: 0 4px 16px rgba(16, 185, 129, 0.28), 0 1px 0 rgba(255, 255, 255, 0.2) inset;
     letter-spacing: 0.02em;
-    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
   }
   .btn-primary svg { width: 15px; height: 15px; }
-  .btn-primary::before {
-    content: '';
-    position: absolute;
-    top: 0; left: -100%;
-    width: 100%; height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
-    transition: left 0.6s;
-  }
-  .btn-primary:hover::before { left: 100%; }
   .btn-primary:hover {
     box-shadow: 0 10px 32px rgba(16, 185, 129, 0.5), 0 1px 0 rgba(255, 255, 255, 0.28) inset;
+    transform: translateY(-1px);
   }
+  .btn-primary:active { transform: translateY(0) scale(0.99); }
+
   .btn-secondary {
     background: var(--surface-2);
     color: var(--text-dim);
@@ -547,17 +513,14 @@
     border: 1px solid var(--border-soft);
     font-size: 13px;
     border-radius: 8px;
-    z-index: 1;
     line-height: 1;
   }
   .btn-remove:hover {
     color: var(--danger);
     border-color: var(--danger);
     background: var(--danger-soft);
-    transform: rotate(90deg);
   }
 
-  /* RESULT */
   .result {
     margin-top: 22px;
     background: var(--surface);
@@ -568,6 +531,7 @@
     position: relative;
     overflow: hidden;
     animation: resultIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    padding: 22px;
   }
   @keyframes resultIn {
     from { opacity: 0; transform: translateY(10px); }
@@ -584,14 +548,14 @@
     box-shadow: 0 0 14px var(--accent-glow);
   }
   .result-hero {
-    padding: 22px 22px 20px;
-    background: linear-gradient(180deg, rgba(16, 185, 129, 0.06) 0%, transparent 100%);
+    padding: 0 0 18px;
     border-bottom: 1px solid var(--border);
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 14px;
     flex-wrap: wrap;
+    margin-bottom: 16px;
   }
   .result-hero-label {
     font-size: 11px;
@@ -629,25 +593,19 @@
   }
   .result-hero-icon svg { width: 24px; height: 24px; }
 
-  .result-body {
-    padding: 18px 22px;
-  }
   .breakdown {
     font-size: 12.5px;
     color: var(--muted);
     padding: 7px 0;
     border-bottom: 1px solid var(--border);
     font-family: 'JetBrains Mono', monospace;
-    transition: color 0.2s, transform 0.2s;
+    transition: color 0.2s;
     display: flex;
     justify-content: space-between;
   }
-  .breakdown:hover { color: var(--text-dim); transform: translateX(3px); }
+  .breakdown:hover { color: var(--text-dim); }
   .breakdown:last-of-type { border-bottom: none; }
-  .breakdown .b-type {
-    color: var(--accent);
-    font-weight: 700;
-  }
+  .breakdown .b-type { color: var(--accent); font-weight: 700; }
   .breakdown .b-type.non-w { color: var(--warn); }
 
   hr { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
@@ -749,11 +707,7 @@
   .saldo-sub .highlight { color: var(--accent); font-weight: 700; font-family: 'JetBrains Mono', monospace; }
   .saldo-sub .highlight.lose { color: var(--danger); }
 
-  .copy-row {
-    display: flex;
-    gap: 8px;
-    margin-top: 16px;
-  }
+  .copy-row { display: flex; gap: 8px; margin-top: 16px; }
   .btn-copy {
     flex: 1;
     background: var(--surface-2);
@@ -778,7 +732,6 @@
     background: var(--accent-soft);
   }
 
-  /* HINT */
   .hint {
     font-size: 12.5px;
     color: var(--muted);
@@ -874,14 +827,9 @@
   }
   ::-webkit-scrollbar-thumb:hover { background: #4a5460; }
 
-  /* reveal */
-  .reveal { opacity: 0; transform: translateY(14px); transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1); }
-  .reveal.in { opacity: 1; transform: translateY(0); }
-
   @media (max-width: 620px) {
-    body { padding: 16px 12px; perspective: none; }
-    .card { border-radius: 20px; transform: none !important; }
-    .card-inner { transform: none !important; }
+    body { padding: 16px 12px; }
+    .card { border-radius: 20px; }
     .hero { padding: 24px 20px 20px; }
     .hero h1 { font-size: 20px; }
     .logo { width: 46px; height: 46px; }
@@ -894,14 +842,12 @@
     .leg { flex-wrap: wrap; }
     .leg input.odds { flex: 1 1 calc(100% - 40px); }
     .leg select.result-type { flex: 1; width: auto; }
-    .result-hero { padding: 18px; }
+    .result { padding: 18px; }
     .result-hero-value { font-size: 26px; }
-    .result-body { padding: 14px 18px; }
     .saldo-value { font-size: 24px; }
   }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
-    .card { transform: none !important; }
   }
 </style>
 </head>
@@ -912,126 +858,117 @@
 
 <div class="card" id="card">
   <div class="scan"></div>
-  <div class="card-inner">
 
-    <!-- HERO HEADER -->
-    <div class="hero">
-      <div class="hero-top">
-        <div class="logo">
-          <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0" stop-color="#10b981"/>
-                <stop offset="1" stop-color="#06b6d4"/>
-              </linearGradient>
-            </defs>
-            <path d="M22 46V20h14a9 9 0 0 1 0 18h-7" fill="none" stroke="url(#lg)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-            <circle cx="42" cy="46" r="3.5" fill="#10b981"/>
-          </svg>
-        </div>
-        <div class="title-block">
-          <h1>Mix Parlay Calculator</h1>
-          <div class="sub">
-            <span class="badge">BETA</span>
-            <span>Auto-read odds &amp; status dari bill</span>
-          </div>
-        </div>
+  <div class="hero">
+    <div class="hero-top">
+      <div class="logo">
+        <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#10b981"/>
+              <stop offset="1" stop-color="#06b6d4"/>
+            </linearGradient>
+          </defs>
+          <path d="M22 46V20h14a9 9 0 0 1 0 18h-7" fill="none" stroke="url(#lg)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="42" cy="46" r="3.5" fill="#10b981"/>
+        </svg>
       </div>
-
-      <!-- LIVE STATS BAR -->
-      <div class="live-bar">
-        <div class="live-chip">
-          <div class="live-chip-label">Legs</div>
-          <div class="live-chip-value" id="liveLegs">0</div>
-        </div>
-        <div class="live-chip">
-          <div class="live-chip-label">Total Odds</div>
-          <div class="live-chip-value accent" id="liveOdds">0.000</div>
-        </div>
-        <div class="live-chip">
-          <div class="live-chip-label">Potensi</div>
-          <div class="live-chip-value" id="livePayout">0.00</div>
+      <div class="title-block">
+        <h1>Mix Parlay Calculator</h1>
+        <div class="sub">
+          <span class="badge">BETA</span>
+          <span>Auto-read odds &amp; status dari bill</span>
         </div>
       </div>
     </div>
 
-    <!-- BODY -->
-    <div class="body-content">
-
-      <!-- PASTE SECTION -->
-      <div class="section reveal" style="margin-top: 0;">
-        <label>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6a2 2 0 0 1 2 2v2h2a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h2V4a2 2 0 0 1 2-2z"/><path d="M9 12h6M9 16h6"/></svg>
-          Paste Teks Bill Parlay
-        </label>
-        <textarea id="pasteText" placeholder="Paste teks bill lu di sini... Contoh:&#10;&#10;1&#10;JAPAN EMPEROR CUP&#10;FC Machida Zelvia vs Tochigi City FC&#10;Type : Over/Under  Odds: 1.64&#10;Bet : FC Machida Zelvia Win&#10;@ 1.640&#10;&#10;Bet Amount : 322.00&#10;Odds : 5.912&#10;Est. /Payout: 1,903.66"></textarea>
-        <button class="btn-primary magnetic" onclick="applyPaste()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-          Parse &amp; Terapkan
-        </button>
-        <div id="ocrStatus" class="ocr-status"></div>
-        <div class="paste-hint">
-          💡 Copy teks bill dari chat/catatan. Parser bakal cari odds + status (W / WH / D / LH / L) + stake + saldo.
-        </div>
+    <div class="live-bar">
+      <div class="live-chip">
+        <div class="live-chip-label">Legs</div>
+        <div class="live-chip-value" id="liveLegs">0</div>
       </div>
-
-      <!-- SALDO & STAKE -->
-      <div class="input-grid section reveal">
-        <div>
-          <label for="saldoAwal">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/></svg>
-            Saldo Awal
-          </label>
-          <input type="number" id="saldoAwal" value="322" min="0" step="any">
-        </div>
-        <div>
-          <label for="stake">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-            Nilai Taruhan
-          </label>
-          <input type="number" id="stake" value="322" min="0" step="any">
-        </div>
+      <div class="live-chip">
+        <div class="live-chip-label">Total Odds</div>
+        <div class="live-chip-value accent" id="liveOdds">0.000</div>
       </div>
-
-      <!-- LEGS -->
-      <div class="section reveal">
-        <div class="legs-header">
-          <label style="margin-bottom: 0;">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-            Daftar Pilihan
-          </label>
-          <span class="count" id="legCount">2 LEG</span>
-        </div>
-        <div id="legs"></div>
-        <button class="btn-secondary magnetic" onclick="addLeg()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Tambah Pilihan
-        </button>
+      <div class="live-chip">
+        <div class="live-chip-label">Potensi</div>
+        <div class="live-chip-value" id="livePayout">0.00</div>
       </div>
+    </div>
+  </div>
 
-      <!-- HITUNG -->
-      <button class="btn-primary magnetic reveal" onclick="calculate()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-        Hitung Hasil
+  <div class="body-content">
+
+    <div class="section" style="margin-top: 0;">
+      <label>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6a2 2 0 0 1 2 2v2h2a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h2V4a2 2 0 0 1 2-2z"/><path d="M9 12h6M9 16h6"/></svg>
+        Paste Teks Bill Parlay
+      </label>
+      <textarea id="pasteText" placeholder="Paste teks bill lu di sini... Contoh:&#10;&#10;1&#10;JAPAN EMPEROR CUP&#10;FC Machida Zelvia vs Tochigi City FC&#10;Type : Over/Under  Odds: 1.64&#10;Bet : FC Machida Zelvia Win&#10;@ 1.640&#10;&#10;Bet Amount : 322.00&#10;Odds : 5.912&#10;Est. /Payout: 1,903.66"></textarea>
+      <button type="button" class="btn-primary" onclick="applyPaste()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Parse &amp; Terapkan
       </button>
-
-      <div id="result" class="result">Hasil perhitungan bakal muncul di sini.</div>
-
-      <div class="hint reveal">
-        <b>Panduan Singkat</b><br>
-        • <b>W</b> — menang penuh, odds tidak berubah<br>
-        • <b>WH</b> — menang separuh, nilai odds jadi <code>(odds − 1) ÷ 2 + 1</code><br>
-        • <b>D</b> — seri, odds dianggap <code>1</code><br>
-        • <b>LH</b> — kalah separuh, odds dianggap <code>0.5</code><br>
-        • <b>L</b> — kalah penuh, seluruh kombinasi dianggap gugur<br><br>
-        <b>Rumus Mix Parlay</b><br>
-        <code>(Total Odds × Nilai Taruhan) − Nilai Taruhan</code><br>
-        <b>Saldo Efektif</b> = Saldo Awal − Taruhan + Nilai Kembali<br><br>
-        <b>Shortcut</b><br>
-        Tekan <span class="kbd-hint">Ctrl</span> + <span class="kbd-hint">Enter</span> buat hitung cepat
+      <div id="ocrStatus" class="ocr-status"></div>
+      <div class="paste-hint">
+        💡 Copy teks bill dari chat/catatan. Parser bakal cari odds + status (W / WH / D / LH / L) + stake + saldo.
       </div>
-
     </div>
+
+    <div class="input-grid section">
+      <div>
+        <label for="saldoAwal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/></svg>
+          Saldo Awal
+        </label>
+        <input type="number" id="saldoAwal" value="322" min="0" step="any">
+      </div>
+      <div>
+        <label for="stake">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          Nilai Taruhan
+        </label>
+        <input type="number" id="stake" value="322" min="0" step="any">
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="legs-header">
+        <label style="margin-bottom: 0;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          Daftar Pilihan
+        </label>
+        <span class="count" id="legCount">2 LEG</span>
+      </div>
+      <div id="legs"></div>
+      <button type="button" class="btn-secondary" onclick="addLeg()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Tambah Pilihan
+      </button>
+    </div>
+
+    <button type="button" class="btn-primary" onclick="calculate()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Hitung Hasil
+    </button>
+
+    <div id="result" class="result">Hasil perhitungan bakal muncul di sini.</div>
+
+    <div class="hint">
+      <b>Panduan Singkat</b><br>
+      • <b>W</b> — menang penuh, odds tidak berubah<br>
+      • <b>WH</b> — menang separuh, nilai odds jadi <code>(odds − 1) ÷ 2 + 1</code><br>
+      • <b>D</b> — seri, odds dianggap <code>1</code><br>
+      • <b>LH</b> — kalah separuh, odds dianggap <code>0.5</code><br>
+      • <b>L</b> — kalah penuh, seluruh kombinasi dianggap gugur<br><br>
+      <b>Rumus Mix Parlay</b><br>
+      <code>(Total Odds × Nilai Taruhan) − Nilai Taruhan</code><br>
+      <b>Saldo Efektif</b> = Saldo Awal − Taruhan + Nilai Kembali<br><br>
+      <b>Shortcut</b><br>
+      Tekan <span class="kbd-hint">Ctrl</span> + <span class="kbd-hint">Enter</span> buat hitung cepat
+    </div>
+
   </div>
 </div>
 
@@ -1046,6 +983,7 @@
   ============================================================ */
   (function() {
     const canvas = document.getElementById('particles');
+    if (!canvas) return;
     const ctx = canvas.getContext('2d');
     let particles = [];
     let W, H;
@@ -1106,48 +1044,7 @@
   })();
 
   /* ============================================================
-     CARD 3D TILT
-  ============================================================ */
-  (function() {
-    const card = document.getElementById('card');
-    if (window.matchMedia('(pointer: coarse)').matches) return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    let targetRX = 0, targetRY = 0, curRX = 0, curRY = 0;
-    function loop() {
-      curRX += (targetRX - curRX) * 0.12;
-      curRY += (targetRY - curRY) * 0.12;
-      card.style.transform = `rotateX(${curRX}deg) rotateY(${curRY}deg)`;
-      requestAnimationFrame(loop);
-    }
-    document.addEventListener('mousemove', (e) => {
-      const rect = card.getBoundingClientRect();
-      const cx = rect.left + rect.width / 2;
-      const cy = rect.top + rect.height / 2;
-      targetRY = ((e.clientX - cx) / rect.width) * 3;
-      targetRX = -((e.clientY - cy) / rect.height) * 3;
-    });
-    document.addEventListener('mouseleave', () => { targetRX = 0; targetRY = 0; });
-    loop();
-  })();
-
-  /* ============================================================
-     MAGNETIC BUTTONS
-  ============================================================ */
-  (function() {
-    if (window.matchMedia('(pointer: coarse)').matches) return;
-    document.querySelectorAll('.magnetic').forEach(btn => {
-      btn.addEventListener('mousemove', (e) => {
-        const r = btn.getBoundingClientRect();
-        const dx = e.clientX - (r.left + r.width / 2);
-        const dy = e.clientY - (r.top + r.height / 2);
-        btn.style.transform = `translate(${dx * 0.08}px, ${dy * 0.15}px)`;
-      });
-      btn.addEventListener('mouseleave', () => { btn.style.transform = ''; });
-    });
-  })();
-
-  /* ============================================================
-     RIPPLE
+     RIPPLE (event delegation, aman)
   ============================================================ */
   document.addEventListener('click', (e) => {
     const btn = e.target.closest('button');
@@ -1163,40 +1060,13 @@
     setTimeout(() => ripple.remove(), 600);
   });
 
-  /* ============================================================
-     MOUSE-FOLLOW GLOW
-  ============================================================ */
-  document.addEventListener('mousemove', (e) => {
-    const leg = e.target.closest('.leg');
-    if (!leg) return;
-    const rect = leg.getBoundingClientRect();
-    leg.style.setProperty('--mx', ((e.clientX - rect.left) / rect.width * 100) + '%');
-    leg.style.setProperty('--my', ((e.clientY - rect.top) / rect.height * 100) + '%');
-  });
-
-  /* ============================================================
-     SECTION REVEAL
-  ============================================================ */
-  (function() {
-    const els = document.querySelectorAll('.reveal');
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach(en => {
-        if (en.isIntersecting) {
-          en.target.classList.add('in');
-          io.unobserve(en.target);
-        }
-      });
-    }, { threshold: 0.1 });
-    els.forEach(el => io.observe(el));
-  })();
-
   function setStatus(msg, type = 'info') {
     ocrStatus.innerHTML = msg;
     ocrStatus.className = 'ocr-status show ' + type;
   }
 
   /* ============================================================
-     PARSER (unchanged)
+     PARSER
   ============================================================ */
   function parseBill(text) {
     const rawLines = text
@@ -1317,9 +1187,6 @@
     return parseFloat(s.replace(/\./g, '').replace(',', '.')) || 0;
   }
 
-  /* ============================================================
-     APPLY PASTE
-  ============================================================ */
   function applyPaste() {
     const text = pasteText.value || '';
     if (!text.trim()) { setStatus('Teks masih kosong, bre.', 'error'); return; }
@@ -1359,9 +1226,6 @@
     updateLiveStats();
   }
 
-  /* ============================================================
-     LEGS
-  ============================================================ */
   const TYPE_OPTIONS = [
     { value: 'W',  label: 'W — Menang' },
     { value: 'WH', label: 'WH — Menang ½' },
@@ -1379,7 +1243,7 @@
       <select class="result-type" data-status="${type}">
         ${TYPE_OPTIONS.map(o => `<option value="${o.value}" ${o.value === type ? 'selected' : ''}>${o.label}</option>`).join('')}
       </select>
-      <button class="btn-remove" onclick="removeLeg(this)">✕</button>
+      <button type="button" class="btn-remove" onclick="removeLeg(this)">✕</button>
     `;
     const sel = wrap.querySelector('select');
     sel.addEventListener('change', () => { sel.dataset.status = sel.value; updateLiveStats(); });
@@ -1419,9 +1283,6 @@
     return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
 
-  /* ============================================================
-     LIVE STATS BAR
-  ============================================================ */
   function updateLiveStats() {
     const legEls = document.querySelectorAll('.leg');
     const stake = parseFloat(document.getElementById('stake').value) || 0;
@@ -1443,13 +1304,9 @@
     document.getElementById('livePayout').textContent = formatNum(payout);
   }
 
-  // Listen to saldo/stake changes
   document.getElementById('stake').addEventListener('input', updateLiveStats);
   document.getElementById('saldoAwal').addEventListener('input', updateLiveStats);
 
-  /* ============================================================
-     ANIMATED NUMBER
-  ============================================================ */
   function animateNumber(el, target, decimals = 2, duration = 800) {
     const startTime = performance.now();
     const formatter = (v) => v.toLocaleString('en-US', {
@@ -1466,9 +1323,6 @@
     requestAnimationFrame(tick);
   }
 
-  /* ============================================================
-     CALCULATE
-  ============================================================ */
   let lastResultText = '';
 
   function calculate() {
@@ -1514,23 +1368,21 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="#f85149" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </div>
         </div>
-        <div class="result-body">
-          ${breakdown.map(b => `<div class="breakdown"><span>Pilihan ${b.i}: odds ${b.odds.toFixed(2)}</span><span class="b-type non-w">${b.type}</span></div>`).join('')}
-          <hr>
-          <div class="row"><span>Saldo Awal</span><span>${formatNum(saldoAwal)}</span></div>
-          <div class="row"><span>Taruhan (Hangus)</span><span class="status-lose">−${formatNum(stake)}</span></div>
-          <div class="row"><span>Nilai Kembali</span><span>0.00</span></div>
-          <div class="saldo-panel lose">
-            <div class="saldo-label">Saldo Efektif Akhir</div>
-            <div class="saldo-value lose" id="animSaldoAkhirLose">0.00</div>
-            <div class="saldo-sub">Kemenangan Bersih: <span class="highlight lose">−${formatNum(stake)}</span></div>
-          </div>
-          <div class="copy-row">
-            <button class="btn-copy" onclick="copyResult(this)">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
-              Copy Hasil
-            </button>
-          </div>
+        ${breakdown.map(b => `<div class="breakdown"><span>Pilihan ${b.i}: odds ${b.odds.toFixed(2)}</span><span class="b-type non-w">${b.type}</span></div>`).join('')}
+        <hr>
+        <div class="row"><span>Saldo Awal</span><span>${formatNum(saldoAwal)}</span></div>
+        <div class="row"><span>Taruhan (Hangus)</span><span class="status-lose">−${formatNum(stake)}</span></div>
+        <div class="row"><span>Nilai Kembali</span><span>0.00</span></div>
+        <div class="saldo-panel lose">
+          <div class="saldo-label">Saldo Efektif Akhir</div>
+          <div class="saldo-value lose" id="animSaldoAkhirLose">0.00</div>
+          <div class="saldo-sub">Kemenangan Bersih: <span class="highlight lose">−${formatNum(stake)}</span></div>
+        </div>
+        <div class="copy-row">
+          <button type="button" class="btn-copy" onclick="copyResult(this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+            Copy Hasil
+          </button>
         </div>
       `;
       animateNumber(document.getElementById('animSaldoAkhirLose'), saldoAkhir, 2);
@@ -1554,27 +1406,25 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
         </div>
       </div>
-      <div class="result-body">
-        ${breakdown.map(b => `<div class="breakdown"><span>Pilihan ${b.i}: odds ${b.odds.toFixed(2)} → efektif ${b.adj.toFixed(2)}</span><span class="b-type ${b.isNonW ? 'non-w' : ''}">${b.type}</span></div>`).join('')}
-        <hr>
-        <div class="row"><span>Saldo Awal</span><span>${formatNum(saldoAwal)}</span></div>
-        <div class="row"><span>Taruhan</span><span class="status-lose">−${formatNum(stake)}</span></div>
-        <div class="row"><span>Nilai Kembali</span><span class="status-win" id="animGross">+0.00</span></div>
-        <div class="saldo-panel ${isWin ? '' : 'lose'}">
-          <div class="saldo-label">Saldo Efektif Akhir</div>
-          <div class="saldo-value ${isWin ? '' : 'lose'}" id="animSaldoAkhir">0.00</div>
-          <div class="saldo-sub">
-            Kemenangan Bersih: <span class="highlight ${isWin ? '' : 'lose'}" id="animNet">+0.00</span>
-            <br>
-            ${isWin ? 'Hasil plus — menang sebesar angka di atas.' : 'Hasil minus — rugi sebesar angka di atas.'}
-          </div>
+      ${breakdown.map(b => `<div class="breakdown"><span>Pilihan ${b.i}: odds ${b.odds.toFixed(2)} → efektif ${b.adj.toFixed(2)}</span><span class="b-type ${b.isNonW ? 'non-w' : ''}">${b.type}</span></div>`).join('')}
+      <hr>
+      <div class="row"><span>Saldo Awal</span><span>${formatNum(saldoAwal)}</span></div>
+      <div class="row"><span>Taruhan</span><span class="status-lose">−${formatNum(stake)}</span></div>
+      <div class="row"><span>Nilai Kembali</span><span class="status-win" id="animGross">+0.00</span></div>
+      <div class="saldo-panel ${isWin ? '' : 'lose'}">
+        <div class="saldo-label">Saldo Efektif Akhir</div>
+        <div class="saldo-value ${isWin ? '' : 'lose'}" id="animSaldoAkhir">0.00</div>
+        <div class="saldo-sub">
+          Kemenangan Bersih: <span class="highlight ${isWin ? '' : 'lose'}" id="animNet">+0.00</span>
+          <br>
+          ${isWin ? 'Hasil plus — menang sebesar angka di atas.' : 'Hasil minus — rugi sebesar angka di atas.'}
         </div>
-        <div class="copy-row">
-          <button class="btn-copy" onclick="copyResult(this)">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
-            Copy Hasil
-          </button>
-        </div>
+      </div>
+      <div class="copy-row">
+        <button type="button" class="btn-copy" onclick="copyResult(this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+          Copy Hasil
+        </button>
       </div>
     `;
 
@@ -1592,9 +1442,6 @@
     }, 450);
   }
 
-  /* ============================================================
-     COPY RESULT
-  ============================================================ */
   function copyResult(btn) {
     if (!lastResultText) return;
     navigator.clipboard.writeText(lastResultText).then(() => {
@@ -1610,9 +1457,6 @@
     });
   }
 
-  /* ============================================================
-     SHORTCUT Ctrl+Enter
-  ============================================================ */
   document.addEventListener('keydown', (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
       e.preventDefault();
@@ -1620,9 +1464,6 @@
     }
   });
 
-  /* ============================================================
-     INIT
-  ============================================================ */
   addLeg('1.85', 'W');
   addLeg('2.10', 'W');
 </script>
