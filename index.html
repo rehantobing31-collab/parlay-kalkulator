@@ -12,9 +12,9 @@
     --neon: #00e5ff;
     --neon-2: #7c3aed;
     --neon-3: #ff006e;
+    --gold: #ffd700;
+    --green: #00ffa3;
     --bg-1: #05060c;
-    --bg-2: #0a0e1c;
-    --bg-3: #10152b;
     --panel: rgba(16, 21, 43, 0.65);
     --border: rgba(0, 229, 255, 0.25);
     --text: #e6f1ff;
@@ -36,7 +36,6 @@
     position: relative;
   }
 
-  /* Animated background grid + glow */
   body::before {
     content: '';
     position: fixed;
@@ -67,7 +66,6 @@
     100% { background-position: 48px 48px, 48px 48px; }
   }
 
-  /* ===== CARD ===== */
   .card {
     position: relative;
     background: var(--panel);
@@ -90,7 +88,6 @@
     to { opacity: 1; transform: translateY(0) scale(1); }
   }
 
-  /* Corner accents */
   .card::before,
   .card::after {
     content: '';
@@ -113,7 +110,6 @@
     box-shadow: 2px 2px 12px rgba(0,229,255,0.5);
   }
 
-  /* ===== HEADER ===== */
   .header {
     margin-bottom: 26px;
     padding-bottom: 20px;
@@ -168,7 +164,6 @@
     50% { opacity: 0.4; transform: scale(0.8); }
   }
 
-  /* ===== LABEL ===== */
   label {
     display: block;
     font-family: 'Orbitron', sans-serif;
@@ -181,7 +176,6 @@
     text-shadow: 0 0 8px rgba(0,229,255,0.4);
   }
 
-  /* ===== INPUTS ===== */
   input, select {
     padding: 12px 14px;
     border-radius: 10px;
@@ -196,9 +190,7 @@
     width: 100%;
   }
 
-  input:hover, select:hover {
-    border-color: rgba(0,229,255,0.4);
-  }
+  input:hover, select:hover { border-color: rgba(0,229,255,0.4); }
 
   input:focus, select:focus {
     border-color: var(--neon);
@@ -217,12 +209,15 @@
     padding-right: 34px;
   }
 
-  select option {
-    background: #0a0e1c;
-    color: var(--text);
+  select option { background: #0a0e1c; color: var(--text); }
+
+  /* Grid 2 kolom untuk Saldo Awal + Stake */
+  .input-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
   }
 
-  /* ===== LEG ROWS ===== */
   .leg {
     display: flex;
     gap: 10px;
@@ -250,7 +245,6 @@
   .leg input.odds { flex: 1; min-width: 0; border-radius: 8px; }
   .leg select.result-type { width: 130px; flex-shrink: 0; border-radius: 8px; }
 
-  /* ===== BUTTONS ===== */
   button {
     cursor: pointer;
     border: none;
@@ -324,7 +318,6 @@
     box-shadow: 0 0 16px rgba(255,0,110,0.5);
   }
 
-  /* ===== RESULT ===== */
   .result {
     margin-top: 20px;
     padding: 20px;
@@ -386,7 +379,7 @@
   }
 
   .status-win {
-    color: #00ffa3;
+    color: var(--green);
     font-family: 'Orbitron', sans-serif;
     font-weight: 900;
     text-shadow: 0 0 20px rgba(0,255,163,0.7);
@@ -399,7 +392,105 @@
     text-shadow: 0 0 20px rgba(255,45,111,0.7);
   }
 
-  /* ===== HINT ===== */
+  /* ===== PANEL SALDO EFEKTIF ===== */
+  .saldo-panel {
+    margin-top: 16px;
+    padding: 18px;
+    border-radius: 14px;
+    background:
+      linear-gradient(135deg, rgba(0,229,255,0.08) 0%, rgba(124,58,237,0.08) 100%);
+    border: 1px solid rgba(0,229,255,0.35);
+    position: relative;
+    overflow: hidden;
+    animation: saldoGlow 3s ease-in-out infinite alternate;
+  }
+
+  @keyframes saldoGlow {
+    from { box-shadow: 0 0 20px rgba(0,229,255,0.15), inset 0 0 20px rgba(0,229,255,0.05); }
+    to   { box-shadow: 0 0 40px rgba(0,229,255,0.35), inset 0 0 30px rgba(124,58,237,0.1); }
+  }
+
+  .saldo-panel::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: conic-gradient(from 0deg, transparent, rgba(0,229,255,0.15), transparent 30%);
+    animation: rotate 8s linear infinite;
+    pointer-events: none;
+  }
+
+  @keyframes rotate {
+    to { transform: rotate(360deg); }
+  }
+
+  .saldo-label {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    color: var(--neon);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    text-shadow: 0 0 10px rgba(0,229,255,0.6);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .saldo-label::before {
+    content: '◈';
+    color: var(--gold);
+    text-shadow: 0 0 10px var(--gold);
+    animation: pulse 1.8s ease-in-out infinite;
+  }
+
+  .saldo-value {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 32px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    position: relative;
+    z-index: 1;
+    background: linear-gradient(90deg, #fff 0%, var(--neon) 60%, var(--gold) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 40px rgba(0,229,255,0.5);
+    line-height: 1.2;
+  }
+
+  .saldo-value.lose {
+    background: linear-gradient(90deg, #fff 0%, #ff2d6f 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 40px rgba(255,45,111,0.5);
+  }
+
+  .saldo-sub {
+    position: relative;
+    z-index: 1;
+    font-size: 12.5px;
+    color: var(--muted);
+    margin-top: 8px;
+    letter-spacing: 0.5px;
+    line-height: 1.6;
+  }
+
+  .saldo-sub .highlight {
+    color: var(--green);
+    font-weight: 700;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 12px;
+  }
+
+  .saldo-sub .highlight.lose {
+    color: #ff2d6f;
+  }
+
   .hint {
     font-size: 12px;
     color: var(--muted);
@@ -430,7 +521,6 @@
 
   .section { margin-top: 20px; }
 
-  /* ===== SCROLLBAR ===== */
   ::-webkit-scrollbar { width: 8px; }
   ::-webkit-scrollbar-track { background: var(--bg-1); }
   ::-webkit-scrollbar-thumb {
@@ -438,14 +528,15 @@
     border-radius: 4px;
   }
 
-  /* ===== MOBILE ===== */
   @media (max-width: 520px) {
     .card { padding: 24px 18px; border-radius: 16px; }
     h1 { font-size: 18px; letter-spacing: 1.5px; }
+    .input-grid { grid-template-columns: 1fr; }
     .leg { flex-wrap: wrap; }
     .leg input.odds { flex: 1 1 100%; }
     .leg select.result-type { flex: 1; width: auto; }
     .big { font-size: 18px; }
+    .saldo-value { font-size: 24px; }
     .btn-primary { padding: 14px; font-size: 12px; }
   }
 </style>
@@ -454,11 +545,19 @@
 <div class="card">
   <div class="header">
     <h1>Mix Parlay Calculator</h1>
-    <div class="sub">Hitung potensi hasil dari beberapa pilihan dalam satu taruhan berganda</div>
+    <div class="sub">Hitung potensi hasil &amp; saldo efektif dari taruhan berganda</div>
   </div>
 
-  <label for="stake">Nilai Taruhan</label>
-  <input type="number" id="stake" value="100000" min="0" step="any">
+  <div class="input-grid">
+    <div>
+      <label for="saldoAwal">Saldo Awal</label>
+      <input type="number" id="saldoAwal" value="1000000" min="0" step="any">
+    </div>
+    <div>
+      <label for="stake">Nilai Taruhan</label>
+      <input type="number" id="stake" value="100000" min="0" step="any">
+    </div>
+  </div>
 
   <div class="section">
     <label>Daftar Pilihan (Odds &amp; Hasil)</label>
@@ -478,7 +577,7 @@
     • <b>L</b> — kalah penuh, seluruh kombinasi dianggap gugur<br><br>
     <b>Rumus Mix Parlay</b><br>
     <code>(Total Odds × Nilai Taruhan) − Nilai Taruhan</code><br>
-    Hasil <b>minus</b> = sebesar itu yang lu kalah. Hasil <b>plus</b> = sebesar itu yang lu menang.
+    <b>Saldo Efektif</b> = Saldo Awal − Taruhan + Nilai Kembali
   </div>
 </div>
 
@@ -524,12 +623,18 @@
   }
 
   function calculate() {
+    const saldoAwal = parseFloat(document.getElementById('saldoAwal').value) || 0;
     const stake = parseFloat(document.getElementById('stake').value) || 0;
     const legEls = document.querySelectorAll('.leg');
     const result = document.getElementById('result');
 
     if (legEls.length === 0) {
       result.innerHTML = 'Minimal harus ada 1 pilihan, bre.';
+      return;
+    }
+
+    if (stake > saldoAwal) {
+      result.innerHTML = '<span class="status-lose">Nilai taruhan melebihi saldo awal, bre!</span>';
       return;
     }
 
@@ -563,14 +668,25 @@
       return;
     }
 
+    // ====== KASUS KALAH PENUH (L) ======
     if (anyLose) {
+      const saldoAkhir = saldoAwal - stake;
       result.innerHTML = `
         <div class="status-lose">Ada pilihan yang kalah penuh (L).</div>
         <hr>
-        <div class="row"><span>Nilai Taruhan</span><span>${formatNum(stake)}</span></div>
-        <div class="row"><span>Hasil Akhir</span><span class="status-lose">−${formatNum(stake)}</span></div>
+        <div class="row"><span>Saldo Awal</span><span>${formatNum(saldoAwal)}</span></div>
+        <div class="row"><span>Taruhan (Hangus)</span><span class="status-lose">−${formatNum(stake)}</span></div>
+        <div class="row"><span>Nilai Kembali</span><span>0</span></div>
         <div style="font-size:12px;color:#7b8ba8;margin-top:10px;">
           Seluruh kombinasi gugur, jadi taruhan dianggap hangus.
+        </div>
+
+        <div class="saldo-panel">
+          <div class="saldo-label">Saldo Efektif Akhir</div>
+          <div class="saldo-value lose">${formatNum(saldoAkhir)}</div>
+          <div class="saldo-sub">
+            Kemenangan Bersih: <span class="highlight lose">−${formatNum(stake)}</span>
+          </div>
         </div>
       `;
       return;
@@ -579,24 +695,29 @@
     const grossReturn = stake * totalOdds;
     const netResult = grossReturn - stake;
     const isWin = netResult >= 0;
+    const saldoAkhir = saldoAwal - stake + grossReturn;
 
     result.innerHTML = `
       ${breakdown.map(b => `<div class="breakdown">${b}</div>`).join('')}
       <hr>
       <div class="row"><span>Total Odds</span><span class="big">${totalOdds.toFixed(2)}</span></div>
-      <div class="row"><span>Nilai Taruhan</span><span>${formatNum(stake)}</span></div>
-      <div class="row"><span>Nilai Kembali</span><span>${formatNum(grossReturn)}</span></div>
-      <hr>
-      <div class="row">
-        <span>Hasil Bersih</span>
-        <span class="${isWin ? 'status-win' : 'status-lose'} big">
-          ${isWin ? '+' : '−'}${formatNum(Math.abs(netResult))}
-        </span>
-      </div>
-      <div style="font-size:12px;color:#7b8ba8;margin-top:10px;letter-spacing:0.5px;">
-        ${isWin
-          ? 'Hasil plus → lu menang sebesar angka di atas.'
-          : 'Hasil minus → lu kalah sebesar angka di atas.'}
+      <div class="row"><span>Saldo Awal</span><span>${formatNum(saldoAwal)}</span></div>
+      <div class="row"><span>Taruhan</span><span class="status-lose">−${formatNum(stake)}</span></div>
+      <div class="row"><span>Nilai Kembali</span><span class="status-win">+${formatNum(grossReturn)}</span></div>
+
+      <div class="saldo-panel">
+        <div class="saldo-label">Saldo Efektif Akhir</div>
+        <div class="saldo-value ${isWin ? '' : 'lose'}">${formatNum(saldoAkhir)}</div>
+        <div class="saldo-sub">
+          Kemenangan Bersih:
+          <span class="highlight ${isWin ? '' : 'lose'}">
+            ${isWin ? '+' : '−'}${formatNum(Math.abs(netResult))}
+          </span>
+          <br>
+          ${isWin
+            ? 'Saldo naik dari taruhan ini — hasil plus, lu untung sebesar angka di atas.'
+            : 'Saldo turun dari taruhan ini — hasil minus, lu rugi sebesar angka di atas.'}
+        </div>
       </div>
     `;
   }
