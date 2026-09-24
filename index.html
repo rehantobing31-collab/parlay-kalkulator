@@ -3,9 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mix Parlay Calculator — UE5 Edition</title>
+<title>Mix Parlay Calculator</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -68,49 +67,16 @@
   input:focus, select:focus, textarea:focus { border-color: var(--neon); box-shadow: 0 0 0 3px rgba(0,229,255,0.1), 0 0 20px rgba(0,229,255,0.25); background: rgba(5, 6, 12, 0.9); }
   select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml;utf8,<svg fill='%2300e5ff' height='20' viewBox='0 0 24 24' width='20' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>"); background-repeat: no-repeat; background-position: right 8px center; padding-right: 34px; }
   select option { background: #0a0e1c; color: var(--text); }
-  textarea { min-height: 130px; resize: vertical; font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.5; }
+  textarea { min-height: 160px; resize: vertical; font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.5; }
   .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  .tabs { display: flex; gap: 6px; margin-bottom: 14px; }
-  .tab { flex: 1; padding: 10px 12px; border-radius: 10px; background: rgba(0,229,255,0.05); border: 1px solid rgba(0,229,255,0.15); color: var(--muted); font-family: 'Orbitron', sans-serif; font-size: 10.5px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; text-align: center; cursor: pointer; transition: all 0.2s; }
-  .tab:hover { color: var(--neon); border-color: rgba(0,229,255,0.35); }
-  .tab.active { background: rgba(0,229,255,0.15); color: var(--neon); border-color: var(--neon); box-shadow: 0 0 20px rgba(0,229,255,0.2); }
-  .tab-content { display: none; }
-  .tab-content.active { display: block; animation: legIn 0.35s ease; }
-  .drop-zone { margin-top: 4px; padding: 28px 18px; border: 2px dashed rgba(0,229,255,0.35); border-radius: 14px; text-align: center; cursor: pointer; background: rgba(0,229,255,0.03); transition: all 0.25s ease; position: relative; overflow: hidden; }
-  .drop-zone:hover { border-color: var(--neon); background: rgba(0,229,255,0.08); box-shadow: 0 0 30px rgba(0,229,255,0.2); }
-  .drop-zone.dragover { border-color: var(--neon); background: rgba(0,229,255,0.15); box-shadow: 0 0 40px rgba(0,229,255,0.4); transform: scale(1.01); }
-  .drop-icon { font-size: 32px; margin-bottom: 8px; filter: drop-shadow(0 0 12px rgba(0,229,255,0.7)); }
-  .drop-text { font-size: 14px; font-weight: 600; letter-spacing: 0.5px; color: var(--text); margin-bottom: 4px; }
-  .drop-sub { font-size: 11.5px; color: var(--muted); letter-spacing: 0.5px; }
-  .preview-wrap { display: none; margin-top: 14px; padding: 12px; background: rgba(5,6,12,0.6); border: 1px solid rgba(0,229,255,0.2); border-radius: 12px; }
-  .preview-wrap.show { display: block; animation: legIn 0.4s ease; }
-  .preview-img { width: 100%; max-height: 260px; object-fit: contain; border-radius: 8px; margin-bottom: 10px; display: block; }
-  .preview-actions { display: flex; gap: 8px; }
-  .preview-actions button { flex: 1; }
-  .progress-wrap { display: none; margin-top: 14px; }
-  .progress-wrap.show { display: block; }
-  .progress-bar { height: 6px; background: rgba(0,229,255,0.1); border-radius: 3px; overflow: hidden; margin-bottom: 8px; border: 1px solid rgba(0,229,255,0.2); }
-  .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--neon), var(--neon-2)); border-radius: 3px; transition: width 0.25s ease; box-shadow: 0 0 12px var(--neon); }
-  .progress-text { font-size: 12px; color: var(--neon); letter-spacing: 1px; font-family: 'Orbitron', sans-serif; text-align: center; }
-  .detected-wrap { display: none; margin-top: 14px; padding: 14px; background: rgba(124,58,237,0.06); border: 1px solid rgba(124,58,237,0.3); border-radius: 12px; }
-  .detected-wrap.show { display: block; animation: legIn 0.4s ease; }
-  .detected-wrap textarea { margin-bottom: 10px; }
-  .detected-actions { display: flex; gap: 8px; }
-  .detected-actions button { flex: 1; }
   .leg { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; padding: 10px; background: rgba(0,229,255,0.03); border: 1px solid rgba(0,229,255,0.1); border-radius: 12px; transition: all 0.2s; animation: legIn 0.4s ease; }
   @keyframes legIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
   .leg:hover { border-color: rgba(0,229,255,0.35); background: rgba(0,229,255,0.05); box-shadow: 0 0 20px rgba(0,229,255,0.1); }
   .leg input.odds { flex: 1; min-width: 0; border-radius: 8px; }
   .leg select.result-type { width: 130px; flex-shrink: 0; border-radius: 8px; }
   .leg select.result-type[data-status="LH"],
-  .leg select.result-type[data-status="WH"] {
-    border-color: var(--gold);
-    box-shadow: 0 0 12px rgba(255,215,0,0.4);
-  }
-  .leg select.result-type[data-status="L"] {
-    border-color: var(--neon-3);
-    box-shadow: 0 0 12px rgba(255,0,110,0.4);
-  }
+  .leg select.result-type[data-status="WH"] { border-color: var(--gold); box-shadow: 0 0 12px rgba(255,215,0,0.4); }
+  .leg select.result-type[data-status="L"] { border-color: var(--neon-3); box-shadow: 0 0 12px rgba(255,0,110,0.4); }
   button { cursor: pointer; border: none; border-radius: 10px; padding: 12px 16px; font-weight: 700; font-size: 13px; font-family: 'Orbitron', sans-serif; letter-spacing: 1.5px; text-transform: uppercase; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
   .btn-primary { background: linear-gradient(135deg, var(--neon) 0%, #0091ff 100%); color: #05060c; width: 100%; margin-top: 16px; padding: 16px; font-size: 14px; box-shadow: 0 4px 20px rgba(0,229,255,0.4), 0 0 40px rgba(0,229,255,0.15); position: relative; overflow: hidden; }
   .btn-primary::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent); transition: left 0.6s; }
@@ -119,8 +85,6 @@
   .btn-primary:active { transform: translateY(0) scale(0.99); }
   .btn-secondary { background: rgba(0,229,255,0.08); color: var(--neon); margin-top: 6px; width: 100%; border: 1px solid rgba(0,229,255,0.3); }
   .btn-secondary:hover { background: rgba(0,229,255,0.15); border-color: var(--neon); box-shadow: 0 0 20px rgba(0,229,255,0.2); }
-  .btn-purple { background: rgba(124,58,237,0.15); color: #c4b5fd; border: 1px solid rgba(124,58,237,0.4); }
-  .btn-purple:hover { background: rgba(124,58,237,0.3); border-color: var(--neon-2); box-shadow: 0 0 20px rgba(124,58,237,0.3); }
   .btn-remove { background: rgba(255,0,110,0.1); color: var(--neon-3); padding: 12px 14px; flex-shrink: 0; border: 1px solid rgba(255,0,110,0.3); font-size: 14px; letter-spacing: 0; border-radius: 8px; }
   .btn-remove:hover { background: rgba(255,0,110,0.25); box-shadow: 0 0 16px rgba(255,0,110,0.5); }
   .result { margin-top: 20px; padding: 20px; background: rgba(5, 6, 12, 0.7); border-radius: 14px; line-height: 1.9; font-size: 15px; border: 1px solid rgba(0,229,255,0.2); position: relative; }
@@ -178,55 +142,16 @@
 <div class="card">
   <div class="header">
     <h1>Mix Parlay Calculator</h1>
-    <div class="sub">Upload bill, auto-read status &amp; odds, hitung saldo efektif</div>
+    <div class="sub">Paste teks bill, auto-read odds &amp; status, hitung saldo efektif</div>
   </div>
 
   <div class="section">
-    <label>Input Bill Parlay (Opsional)</label>
-    <div class="tabs">
-      <div class="tab active" data-tab="ocr" onclick="switchTab('ocr')">📸 Upload Gambar</div>
-      <div class="tab" data-tab="paste" onclick="switchTab('paste')">📋 Paste Teks</div>
-    </div>
-
-    <div id="tab-ocr" class="tab-content active">
-      <div id="dropZone" class="drop-zone">
-        <input type="file" id="fileInput" accept="image/*" hidden>
-        <div class="drop-icon">⬆</div>
-        <div class="drop-text">Klik atau drag &amp; drop gambar bill di sini</div>
-        <div class="drop-sub">JPG, PNG, WEBP — diproses lokal di browser</div>
-      </div>
-
-      <div id="progressWrap" class="progress-wrap">
-        <div class="progress-bar"><div id="progressFill" class="progress-fill"></div></div>
-        <div id="progressText" class="progress-text">Membaca bill... 0%</div>
-      </div>
-
-      <div id="ocrStatus" class="ocr-status"></div>
-
-      <div id="previewWrap" class="preview-wrap">
-        <img id="preview" class="preview-img" alt="Preview bill">
-        <div class="preview-actions">
-          <button class="btn-secondary" onclick="resetUpload()">Hapus Gambar</button>
-          <button class="btn-purple" onclick="runOCR()">Baca Ulang</button>
-        </div>
-      </div>
-
-      <div id="detectedWrap" class="detected-wrap">
-        <label for="detectedText">Teks Terdeteksi (bisa diedit manual)</label>
-        <textarea id="detectedText" placeholder="Teks hasil OCR bakal muncul di sini..."></textarea>
-        <div class="detected-actions">
-          <button class="btn-secondary" onclick="clearDetected()">Bersihkan</button>
-          <button class="btn-primary" style="margin-top:0;" onclick="applyDetected()">Terapkan ke Form</button>
-        </div>
-      </div>
-    </div>
-
-    <div id="tab-paste" class="tab-content">
-      <textarea id="pasteText" placeholder="Paste teks bill lu di sini..."></textarea>
-      <button class="btn-primary" onclick="applyPaste()">Parse &amp; Terapkan</button>
-      <div class="paste-hint">
-        💡 Copy teks bill, paste di sini. Parser bakal cari odds + status otomatis.
-      </div>
+    <label>Paste Teks Bill Parlay</label>
+    <textarea id="pasteText" placeholder="Paste teks bill lu di sini... Contoh:&#10;&#10;1&#10;JAPAN EMPEROR CUP&#10;FC Machida Zelvia vs Tochigi City FC&#10;Type : Over/Under  Odds: 1.64&#10;Bet : FC Machida Zelvia Win&#10;@ 1.640&#10;&#10;Bet Amount : 104.00"></textarea>
+    <button class="btn-primary" onclick="applyPaste()">Parse &amp; Terapkan</button>
+    <div id="ocrStatus" class="ocr-status"></div>
+    <div class="paste-hint">
+      💡 Copy teks bill dari chat/catatan, paste di sini. Parser bakal cari odds + status (W / WH / D / LH / L) + stake + saldo (kalau ada).
     </div>
   </div>
 
@@ -237,7 +162,7 @@
     </div>
     <div>
       <label for="stake">Nilai Taruhan</label>
-      <input type="number" id="stake" value="500" min="0" step="any">
+      <input type="number" id="stake" value="0" min="0" step="any">
     </div>
   </div>
 
@@ -264,260 +189,69 @@
 </div>
 
 <script>
-  /* ============ TABS ============ */
-  function switchTab(name) {
-    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === 'tab-' + name));
-  }
-
-  /* ============ OCR ============ */
-  const dropZone = document.getElementById('dropZone');
-  const fileInput = document.getElementById('fileInput');
-  const previewWrap = document.getElementById('previewWrap');
-  const previewImg = document.getElementById('preview');
-  const progressWrap = document.getElementById('progressWrap');
-  const progressFill = document.getElementById('progressFill');
-  const progressText = document.getElementById('progressText');
-  const ocrStatus = document.getElementById('ocrStatus');
-  const detectedWrap = document.getElementById('detectedWrap');
-  const detectedText = document.getElementById('detectedText');
   const pasteText = document.getElementById('pasteText');
+  const ocrStatus = document.getElementById('ocrStatus');
   const legsContainer = document.getElementById('legs');
-
-  let currentFile = null;
-
-  dropZone.addEventListener('click', () => fileInput.click());
-  fileInput.addEventListener('change', e => {
-    if (e.target.files && e.target.files[0]) handleFile(e.target.files[0]);
-  });
-  ['dragenter', 'dragover'].forEach(evt => {
-    dropZone.addEventListener(evt, e => {
-      e.preventDefault(); e.stopPropagation();
-      dropZone.classList.add('dragover');
-    });
-  });
-  ['dragleave', 'drop'].forEach(evt => {
-    dropZone.addEventListener(evt, e => {
-      e.preventDefault(); e.stopPropagation();
-      dropZone.classList.remove('dragover');
-    });
-  });
-  dropZone.addEventListener('drop', e => {
-    const files = e.dataTransfer.files;
-    if (files && files[0]) handleFile(files[0]);
-  });
-
-  function preprocessImage(file) {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload = () => {
-        const scale = img.width < 1200 ? 2 : 1.5;
-        const canvas = document.createElement('canvas');
-        canvas.width = Math.round(img.width * scale);
-        canvas.height = Math.round(img.height * scale);
-        const ctx = canvas.getContext('2d');
-        ctx.filter = 'grayscale(1) contrast(1.6) brightness(1.1)';
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        canvas.toBlob(blob => resolve(blob), 'image/png');
-      };
-      img.onerror = reject;
-      img.src = URL.createObjectURL(file);
-    });
-  }
-
-  async function handleFile(file) {
-    if (!file.type.startsWith('image/')) {
-      setStatus('File harus berupa gambar, bre.', 'error');
-      return;
-    }
-    currentFile = file;
-    const reader = new FileReader();
-    reader.onload = e => {
-      previewImg.src = e.target.result;
-      previewWrap.classList.add('show');
-      setStatus('Gambar siap. Memulai proses pembacaan...', 'info');
-      setTimeout(runOCR, 200);
-    };
-    reader.readAsDataURL(file);
-  }
 
   function setStatus(msg, type = 'info') {
     ocrStatus.innerHTML = msg;
     ocrStatus.className = 'ocr-status show ' + type;
   }
-  function hideStatus() { ocrStatus.className = 'ocr-status'; }
-
-  function resetUpload() {
-    currentFile = null;
-    fileInput.value = '';
-    previewWrap.classList.remove('show');
-    progressWrap.classList.remove('show');
-    detectedWrap.classList.remove('show');
-    previewImg.src = '';
-    detectedText.value = '';
-    hideStatus();
-  }
-
-  function clearDetected() { detectedText.value = ''; }
-
-  async function runOCR() {
-    if (!currentFile) return;
-    progressWrap.classList.add('show');
-    progressFill.style.width = '0%';
-    progressText.textContent = 'Menyiapkan gambar... 0%';
-    setStatus('Sedang preprocess & membaca gambar. Proses ini 5–40 detik.', 'info');
-
-    try {
-      progressText.textContent = 'Preprocess gambar...';
-      const processed = await preprocessImage(currentFile);
-
-      const result = await Tesseract.recognize(processed, 'eng', {
-        logger: m => {
-          if (m.status === 'recognizing text' && typeof m.progress === 'number') {
-            const p = Math.round(m.progress * 100);
-            progressFill.style.width = p + '%';
-            progressText.textContent = 'Membaca bill... ' + p + '%';
-          } else if (m.status) {
-            progressText.textContent = m.status + '...';
-          }
-        }
-      });
-
-      const raw = (result.data.text || '').trim();
-      detectedText.value = raw;
-      detectedWrap.classList.add('show');
-      progressFill.style.width = '100%';
-      progressText.textContent = 'Selesai!';
-
-      if (raw.length < 3) {
-        setStatus('Teks tidak terdeteksi. Coba gambar lebih jelas.', 'error');
-        return;
-      }
-
-      const parsed = parseBill(raw);
-      applyParsed(parsed, 'OCR');
-    } catch (err) {
-      console.error(err);
-      setStatus('Gagal membaca bill: ' + (err.message || 'unknown error'), 'error');
-      progressFill.style.width = '0%';
-    }
-  }
-
-  function applyParsed(parsed, source) {
-    if (parsed.odds.length > 0) {
-      legsContainer.innerHTML = '';
-      parsed.odds.forEach((o, i) => {
-        const st = (parsed.statuses && parsed.statuses[i]) || 'W';
-        addLeg(o.toFixed(2), st);
-      });
-    }
-    if (parsed.stake) {
-      document.getElementById('stake').value = parsed.stake;
-    }
-
-    const bits = [];
-    if (parsed.odds.length) bits.push(`<span class="stat-pill ok">✓ ${parsed.odds.length} odds</span>`);
-    if (parsed.stake) bits.push(`<span class="stat-pill ok">✓ stake: ${parsed.stake}</span>`);
-    if (!parsed.odds.length) bits.push(`<span class="stat-pill err">✗ odds tidak ada</span>`);
-    if (!parsed.stake) bits.push(`<span class="stat-pill warn">! stake tidak ada</span>`);
-
-    const hasNonW = parsed.statuses && parsed.statuses.some(s => s !== 'W');
-    if (hasNonW) {
-      const count = parsed.statuses.filter(s => s !== 'W').length;
-      bits.push(`<span class="stat-pill warn">⚡ ${count} status non-W</span>`);
-    }
-
-    const type = parsed.odds.length ? 'success' : 'error';
-    setStatus(`${source}: ${bits.join(' ')}<br><span style="font-size:11px;opacity:0.8;">Cek daftar pilihan, edit manual kalau ada yang salah.</span>`, type);
-  }
 
   /* ============================================================
-     PARSER v5 — BLOCK-BASED (1 leg = 1 odds + 1 status)
-     Fix double counting issue.
+     PARSER
   ============================================================ */
   function parseBill(text) {
-    const lines = text
+    const rawLines = text
       .replace(/\r/g, '')
       .split('\n')
       .map(l => l.replace(/[^\x20-\x7E]/g, ' ').replace(/\s+/g, ' ').trim())
       .filter(Boolean);
 
-    const skipLine = (line) =>
-      /^(ref\s*no|date\s*\/\s*time|game\s*type|bet\s*amount|est\.?\s*\/?\s*payout|payout|stake\s*[:=]|taruhan\s*[:=]|total\s*bet)/i.test(line);
-
-    const extractStatus = (line) => {
-      let t = line.trim().toUpperCase();
-      t = t.replace(/@\s*[\d.,]+/g, '').trim();
-      if (/^(WH|LH|W|D|L)$/.test(t)) return t;
-      if (t.length <= 30) {
-        const m = t.match(/(?:^|\s)(WH|LH|W|D|L)$/);
-        if (m) return m[1];
-      }
-      return null;
-    };
-
-    // Split jadi blok per leg — tiap blok mulai dari baris "N  SOMETHING"
-    const blocks = [];
-    let current = null;
-    for (const line of lines) {
-      if (skipLine(line)) continue;
-      const m = line.match(/^(\d{1,3})\s+[A-Z]/);
-      if (m) {
-        if (current) blocks.push(current);
-        current = [line];
-      } else if (current) {
-        current.push(line);
-      }
-    }
-    if (current) blocks.push(current);
-
     const odds = [];
     const statuses = [];
 
-    // Per blok: cari 1 odds + 1 status
-    for (const block of blocks) {
-      let oddsVal = null;
-      let statusVal = null;
+    const skipLine = (line) =>
+      /ref\s*no|date\s*\/\s*time|game\s*type|bet\s*amount|payout|stake\s*[:=]|taruhan\s*[:=]|total\s*bet|^result\s*[:=]/i.test(line);
 
-      for (const line of block) {
-        if (oddsVal === null) {
-          const mAt = line.match(/@\s*([\d.,]+)/);
-          if (mAt) {
-            const v = smartParseOdds(mAt[1]);
-            if (v) oddsVal = v;
-          } else {
-            const mOdds = line.match(/odds?\s*[:=]\s*([\d.,]+)/i);
-            if (mOdds && /type\s*[:=]|over|handicap|1x2|asian/i.test(line)) {
-              const v = smartParseOdds(mOdds[1]);
-              if (v) oddsVal = v;
-            }
+    const isTimeOrDate = (line) =>
+      /\d{1,2}[:/]\d{2}/.test(line);
+
+    // Strategi 1: "@ X.XXX"
+    let found = collectOdds(rawLines, /@\s*(\d{1,3}[.,]\d{1,3})\b/, skipLine);
+    if (found.length === 0) {
+      // Strategi 2: "Odds: X.XX"
+      found = collectOdds(rawLines, /odds?\s*[:=]\s*(\d{1,3}[.,]\d{1,3})\b/i, skipLine);
+    }
+    if (found.length === 0) {
+      // Strategi 3: semua desimal dalam range odds
+      for (let i = 0; i < rawLines.length; i++) {
+        const line = rawLines[i];
+        if (skipLine(line)) continue;
+        if (isTimeOrDate(line)) continue;
+        const matches = [...line.matchAll(/(?:^|\s)(\d{1,2}\.\d{2,3})(?=\s|$)/g)];
+        for (const m of matches) {
+          const v = parseFloat(m[1]);
+          if (v >= 1.05 && v <= 50) {
+            found.push({ value: v, lineIdx: i, line });
           }
         }
-        if (statusVal === null) {
-          const st = extractStatus(line);
-          if (st) statusVal = st;
-        }
-      }
-
-      if (oddsVal !== null) {
-        odds.push(oddsVal);
-        statuses.push(statusVal || 'W');
       }
     }
 
-    // Fallback: kalau block-based gagal total, pakai "@ X.XXX" saja
-    if (odds.length === 0) {
-      for (const line of lines) {
-        if (skipLine(line)) continue;
-        const mAt = line.match(/@\s*([\d.,]+)/);
-        if (mAt) {
-          const v = smartParseOdds(mAt[1]);
-          if (v) {
-            odds.push(v);
-            statuses.push(extractStatus(line) || 'W');
-          }
+    for (const item of found) {
+      odds.push(item.value);
+      let st = extractStatus(item.line);
+      if (!st) {
+        for (let j = item.lineIdx + 1; j <= Math.min(item.lineIdx + 3, rawLines.length - 1); j++) {
+          const nextLine = rawLines[j];
+          if (/@\s*[\d.,]+/.test(nextLine) || /odds?\s*[:=]\s*[\d.,]+/i.test(nextLine)) break;
+          if (skipLine(nextLine)) continue;
+          const nextSt = extractStatus(nextLine);
+          if (nextSt) { st = nextSt; break; }
         }
       }
+      statuses.push(st || 'W');
     }
 
     // Stake
@@ -535,25 +269,47 @@
       }
     }
 
-    return { odds, statuses, stake };
+    // Saldo awal (kalau ada di bill)
+    let saldoAwal = null;
+    const saldoPatterns = [
+      /(?:saldo\s*awal|sisa\s*saldo|balance|modal)\s*[:=]?\s*([\d.,]+)/i,
+    ];
+    for (const p of saldoPatterns) {
+      const m = text.match(p);
+      if (m) {
+        const n = parseAmount(m[1]);
+        if (n >= 1000 && n < 1e15) { saldoAwal = Math.round(n); break; }
+      }
+    }
+
+    return { odds, statuses, stake, saldoAwal };
   }
 
-  function smartParseOdds(raw) {
-    let s = String(raw).trim().replace(/[^\d.,]/g, '');
-    if (!s) return null;
-    if (/[.,]/.test(s)) {
-      const sepCount = (s.match(/[.,]/g) || []).length;
-      if (sepCount > 1) return null;
-      const v = parseFloat(s.replace(',', '.'));
-      if (v >= 1.01 && v <= 100) return v;
-      return null;
+  function collectOdds(lines, regex, skipLine) {
+    const result = [];
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      if (skipLine(line)) continue;
+      const m = line.match(regex);
+      if (m) {
+        const v = parseFloat(m[1].replace(',', '.'));
+        if (v >= 1.01 && v <= 100) {
+          result.push({ value: v, lineIdx: i, line });
+        }
+      }
     }
-    const digits = s.replace(/\D/g, '');
-    if (digits.length < 2 || digits.length > 5) return null;
-    const intPart = digits[0];
-    const decPart = digits.slice(1);
-    const guess = parseFloat(intPart + '.' + decPart);
-    if (guess >= 1.01 && guess <= 100) return guess;
+    return result;
+  }
+
+  function extractStatus(line) {
+    let t = line.trim().toUpperCase();
+    t = t.replace(/@\s*[\d.,]+/g, ' ')
+         .replace(/odds?\s*[:=]\s*[\d.,]+/gi, ' ')
+         .replace(/\s+/g, ' ')
+         .trim();
+    if (/^(WH|LH|W|D|L)$/.test(t)) return t;
+    const m = t.match(/(?:^|\s|\|)(WH|LH|W|D|L)(?:\s*\|)?$/);
+    if (m) return m[1];
     return null;
   }
 
@@ -579,19 +335,49 @@
     return parseFloat(s.replace(/\./g, '').replace(',', '.')) || 0;
   }
 
-  function applyDetected() {
-    const text = detectedText.value || '';
-    if (!text.trim()) { setStatus('Teks masih kosong, bre.', 'error'); return; }
-    const parsed = parseBill(text);
-    applyParsed(parsed, 'Dari teks OCR');
-  }
-
   function applyPaste() {
     const text = pasteText.value || '';
     if (!text.trim()) { setStatus('Teks masih kosong, bre.', 'error'); return; }
+
     const parsed = parseBill(text);
-    applyParsed(parsed, 'Dari teks paste');
-    switchTab('ocr');
+
+    if (parsed.odds.length > 0) {
+      legsContainer.innerHTML = '';
+      parsed.odds.forEach((o, i) => {
+        const st = (parsed.statuses && parsed.statuses[i]) || 'W';
+        addLeg(o.toFixed(2), st);
+      });
+    }
+
+    if (parsed.stake) {
+      document.getElementById('stake').value = parsed.stake;
+
+      // Auto-fill saldo awal
+      if (parsed.saldoAwal) {
+        document.getElementById('saldoAwal').value = parsed.saldoAwal;
+      } else {
+        // Default: stake × 10 sebagai buffer
+        document.getElementById('saldoAwal').value = parsed.stake * 10;
+      }
+    } else if (parsed.saldoAwal) {
+      document.getElementById('saldoAwal').value = parsed.saldoAwal;
+    }
+
+    const bits = [];
+    if (parsed.odds.length) bits.push(`<span class="stat-pill ok">✓ ${parsed.odds.length} odds</span>`);
+    if (parsed.stake) bits.push(`<span class="stat-pill ok">✓ stake: ${parsed.stake}</span>`);
+    if (parsed.saldoAwal) bits.push(`<span class="stat-pill ok">✓ saldo: ${parsed.saldoAwal}</span>`);
+    if (!parsed.odds.length) bits.push(`<span class="stat-pill err">✗ odds tidak ada</span>`);
+    if (!parsed.stake) bits.push(`<span class="stat-pill warn">! stake tidak ada</span>`);
+
+    const hasNonW = parsed.statuses && parsed.statuses.some(s => s !== 'W');
+    if (hasNonW) {
+      const count = parsed.statuses.filter(s => s !== 'W').length;
+      bits.push(`<span class="stat-pill warn">⚡ ${count} status non-W</span>`);
+    }
+
+    const type = parsed.odds.length ? 'success' : 'error';
+    setStatus(`Dari teks paste: ${bits.join(' ')}<br><span style="font-size:11px;opacity:0.8;">Cek daftar pilihan, edit manual kalau ada yang salah.</span>`, type);
   }
 
   /* ============ KALKULATOR PARLAY ============ */
