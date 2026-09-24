@@ -225,7 +225,7 @@
       <textarea id="pasteText" placeholder="Paste teks bill lu di sini..."></textarea>
       <button class="btn-primary" onclick="applyPaste()">Parse &amp; Terapkan</button>
       <div class="paste-hint">
-        💡 Copy teks bill, paste di sini. Parser bakal cari odds + status (W / WH / LH / D / L) otomatis.
+        💡 Copy teks bill, paste di sini. Parser bakal cari odds + status otomatis.
       </div>
     </div>
   </div>
@@ -424,7 +424,7 @@
     const hasNonW = parsed.statuses && parsed.statuses.some(s => s !== 'W');
     if (hasNonW) {
       const count = parsed.statuses.filter(s => s !== 'W').length;
-      bits.push(`<span class="stat-pill warn">⚡ ${count} status non-W terdeteksi</span>`);
+      bits.push(`<span class="stat-pill warn">⚡ ${count} status non-W</span>`);
     }
 
     const type = parsed.odds.length ? 'success' : 'error';
@@ -432,7 +432,8 @@
   }
 
   /* ============================================================
-     PARSER v4 — dengan auto-detect STATUS (W/WH/D/LH/L)
+     PARSER v5 — BLOCK-BASED (1 leg = 1 odds + 1 status)
+     Fix double counting issue.
   ============================================================ */
   function parseBill(text) {
     const lines = text
@@ -441,55 +442,83 @@
       .map(l => l.replace(/[^\x20-\x7E]/g, ' ').replace(/\s+/g, ' ').trim())
       .filter(Boolean);
 
-    const odds = [];
-    const statuses = [];
-
     const skipLine = (line) =>
-      /ref\s*no|date\s*\/\s*time|game\s*type|bet\s*amount|est\.?\s*\/?\s*payout|payout|stake\s*[:=]|taruhan\s*[:=]|total\s*bet/i.test(line);
+      /^(ref\s*no|date\s*\/\s*time|game\s*type|bet\s*amount|est\.?\s*\/?\s*payout|payout|stake\s*[:=]|taruhan\s*[:=]|total\s*bet)/i.test(line);
 
-    // Deteksi status marker W / WH / D / LH / L
     const extractStatus = (line) => {
-      const t = line.trim().toUpperCase();
-      // Standalone: cuma "W" atau "LH" dst
+      let t = line.trim().toUpperCase();
+      t = t.replace(/@\s*[\d.,]+/g, '').trim();
       if (/^(WH|LH|W|D|L)$/.test(t)) return t;
-      // Di akhir line, dipisah spasi
-      const m = t.match(/\s(WH|LH|W|D|L)$/);
-      if (m) return m[1];
+      if (t.length <= 30) {
+        const m = t.match(/(?:^|\s)(WH|LH|W|D|L)$/);
+        if (m) return m[1];
+      }
       return null;
     };
 
+    // Split jadi blok per leg — tiap blok mulai dari baris "N  SOMETHING"
+    const blocks = [];
+    let current = null;
     for (const line of lines) {
       if (skipLine(line)) continue;
-
-      // Cek apakah line ini punya odds
-      let oddsValue = null;
-      const mAt = line.match(/@\s*([\d.,]+)/);
-      const mOdds = line.match(/odds?\s*[:=]\s*([\d.,]+)/i);
-
-      if (mAt) {
-        oddsValue = smartParseOdds(mAt[1]);
-      } else if (mOdds && /type\s*[:=]|over\s*\/\s*under|handicap|1x2|asian/i.test(line)) {
-        oddsValue = smartParseOdds(mOdds[1]);
+      const m = line.match(/^(\d{1,3})\s+[A-Z]/);
+      if (m) {
+        if (current) blocks.push(current);
+        current = [line];
+      } else if (current) {
+        current.push(line);
       }
+    }
+    if (current) blocks.push(current);
 
-      if (oddsValue !== null) {
-        odds.push(oddsValue);
-        // Cek status di line yang sama (biasanya di akhir, misal "@ 1.270  W")
-        statuses.push(extractStatus(line));
-        continue;
-      }
+    const odds = [];
+    const statuses = [];
 
-      // Cek status standalone — assign ke leg terakhir yang belum punya status
-      const st = extractStatus(line);
-      if (st) {
-        for (let i = statuses.length - 1; i >= 0; i--) {
-          if (statuses[i] === null) { statuses[i] = st; break; }
+    // Per blok: cari 1 odds + 1 status
+    for (const block of blocks) {
+      let oddsVal = null;
+      let statusVal = null;
+
+      for (const line of block) {
+        if (oddsVal === null) {
+          const mAt = line.match(/@\s*([\d.,]+)/);
+          if (mAt) {
+            const v = smartParseOdds(mAt[1]);
+            if (v) oddsVal = v;
+          } else {
+            const mOdds = line.match(/odds?\s*[:=]\s*([\d.,]+)/i);
+            if (mOdds && /type\s*[:=]|over|handicap|1x2|asian/i.test(line)) {
+              const v = smartParseOdds(mOdds[1]);
+              if (v) oddsVal = v;
+            }
+          }
         }
+        if (statusVal === null) {
+          const st = extractStatus(line);
+          if (st) statusVal = st;
+        }
+      }
+
+      if (oddsVal !== null) {
+        odds.push(oddsVal);
+        statuses.push(statusVal || 'W');
       }
     }
 
-    // Default: kalau null → 'W'
-    const finalStatuses = statuses.map(s => s || 'W');
+    // Fallback: kalau block-based gagal total, pakai "@ X.XXX" saja
+    if (odds.length === 0) {
+      for (const line of lines) {
+        if (skipLine(line)) continue;
+        const mAt = line.match(/@\s*([\d.,]+)/);
+        if (mAt) {
+          const v = smartParseOdds(mAt[1]);
+          if (v) {
+            odds.push(v);
+            statuses.push(extractStatus(line) || 'W');
+          }
+        }
+      }
+    }
 
     // Stake
     let stake = null;
@@ -506,7 +535,7 @@
       }
     }
 
-    return { odds, statuses: finalStatuses, stake };
+    return { odds, statuses, stake };
   }
 
   function smartParseOdds(raw) {
@@ -584,7 +613,6 @@
       </select>
       <button class="btn-remove" onclick="this.parentElement.remove()">✕</button>
     `;
-    // Update data-status saat dropdown diubah
     const sel = wrap.querySelector('select');
     sel.addEventListener('change', () => sel.dataset.status = sel.value);
     legsContainer.appendChild(wrap);
