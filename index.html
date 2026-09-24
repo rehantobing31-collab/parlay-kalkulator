@@ -46,6 +46,22 @@
     -webkit-font-smoothing: antialiased;
     position: relative;
     overflow-x: hidden;
+    /* ANTI-COPY: block text selection di luar area interaktif */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  /* ANTI-COPY: allow selection di area input/textarea/result/copy */
+  input, textarea,
+  .result, .result *,
+  .btn-copy, .btn-copy *,
+  .leg input, .leg select {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
   }
 
   /* Layer 1: Aurora */
@@ -109,7 +125,6 @@
     50% { transform: translate(50px, 30px) scale(1.2); }
   }
 
-  /* Layer 3: Particle canvas */
   #particles {
     position: fixed;
     inset: 0;
@@ -118,7 +133,6 @@
     opacity: 0.55;
   }
 
-  /* Layer 4: Dot grid */
   body::after {
     content: '';
     position: fixed;
@@ -131,7 +145,6 @@
     pointer-events: none;
   }
 
-  /* Film grain */
   .grain {
     position: fixed;
     inset: 0;
@@ -151,9 +164,34 @@
     100% { transform: translate(0, 0); }
   }
 
-  /* ============================================================
-     CARD
-  ============================================================ */
+  /* Toast notification */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--surface-2);
+    border: 1px solid var(--border-soft);
+    color: var(--text-dim);
+    padding: 11px 20px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.03) inset;
+    opacity: 0;
+    transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 10001;
+    pointer-events: none;
+    white-space: nowrap;
+    max-width: 90vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
   .card {
     position: relative;
     background: linear-gradient(180deg, rgba(22, 28, 37, 0.88) 0%, rgba(16, 21, 28, 0.96) 100%);
@@ -185,7 +223,6 @@
     }
   }
 
-  /* Rotating conic border */
   .card::before {
     content: '';
     position: absolute;
@@ -213,7 +250,6 @@
     to { transform: rotate(360deg); }
   }
 
-  /* Scan line */
   .card .scan {
     position: absolute;
     left: 0; right: 0;
@@ -230,7 +266,6 @@
     50% { top: 96%; opacity: 0.5; }
   }
 
-  /* Shimmer sweep */
   .card .shimmer {
     position: absolute;
     top: 0;
@@ -252,9 +287,6 @@
     50% { left: 100%; }
   }
 
-  /* ============================================================
-     HERO
-  ============================================================ */
   .hero {
     position: relative;
     padding: 36px 36px 28px;
@@ -375,7 +407,6 @@
     50% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
   }
 
-  /* Live stats bar */
   .live-bar {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -431,9 +462,6 @@
     50% { text-shadow: 0 0 24px rgba(16, 185, 129, 0.8), 0 0 40px rgba(16, 185, 129, 0.4); }
   }
 
-  /* ============================================================
-     NOTICE BANNER
-  ============================================================ */
   .notice {
     margin: 20px 36px 0;
     padding: 14px 16px;
@@ -479,9 +507,6 @@
     line-height: 1.55;
   }
 
-  /* ============================================================
-     BODY
-  ============================================================ */
   .body-content {
     padding: 28px 36px 36px;
   }
@@ -618,7 +643,6 @@
     color: var(--danger);
   }
 
-  /* Buttons */
   button {
     cursor: pointer;
     border: none;
@@ -709,7 +733,6 @@
     transform: rotate(90deg);
   }
 
-  /* Result */
   .result {
     margin-top: 22px;
     background: var(--surface);
@@ -1053,6 +1076,7 @@
     .result { padding: 18px; }
     .result-hero-value { font-size: 26px; }
     .saldo-value { font-size: 24px; }
+    .toast { font-size: 12px; padding: 10px 16px; bottom: 16px; }
   }
 </style>
 </head>
@@ -1064,11 +1088,12 @@
 <canvas id="particles"></canvas>
 <div class="grain"></div>
 
+<div class="toast" id="toast"></div>
+
 <div class="card" id="card">
   <div class="scan"></div>
   <div class="shimmer"></div>
 
-  <!-- HERO -->
   <div class="hero">
     <div class="hero-top">
       <div class="logo">
@@ -1108,7 +1133,6 @@
     </div>
   </div>
 
-  <!-- NOTICE -->
   <div class="notice">
     <div class="notice-icon">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -1125,10 +1149,8 @@
     </div>
   </div>
 
-  <!-- BODY -->
   <div class="body-content">
 
-    <!-- PASTE -->
     <div class="section no-underline" style="margin-top: 20px;">
       <label>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6a2 2 0 0 1 2 2v2h2a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h2V4a2 2 0 0 1 2-2z"/><path d="M9 12h6M9 16h6"/></svg>
@@ -1145,7 +1167,6 @@
       </div>
     </div>
 
-    <!-- SALDO & STAKE -->
     <div class="input-grid section">
       <div>
         <label for="saldoAwal">
@@ -1163,7 +1184,6 @@
       </div>
     </div>
 
-    <!-- LEGS -->
     <div class="section">
       <div class="legs-header">
         <label style="margin-bottom: 0;">
@@ -1179,7 +1199,6 @@
       </button>
     </div>
 
-    <!-- HITUNG -->
     <button type="button" class="btn-primary" onclick="calculate()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
       Hitung Hasil
@@ -1209,6 +1228,136 @@
   const ocrStatus = document.getElementById('ocrStatus');
   const legsContainer = document.getElementById('legs');
   const legCount = document.getElementById('legCount');
+
+  /* ============================================================
+     TOAST + ANTI-COPY
+  ============================================================ */
+  let toastTimer;
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+  }
+
+  (function antiCopy() {
+    // Cek apakah elemen/target ada di area yang DI-ALLOW
+    const isAllowed = (el) => {
+      if (!el) return false;
+      if (el.closest) {
+        if (el.closest('textarea')) return true;
+        if (el.closest('input')) return true;
+        if (el.closest('select')) return true;
+        if (el.closest('.btn-copy')) return true;
+        if (el.closest('.result')) return true;
+      }
+      const tag = el.tagName;
+      return tag === 'TEXTAREA' || tag === 'INPUT' || tag === 'SELECT';
+    };
+
+    // 1. Blokir klik kanan di luar area allowed
+    document.addEventListener('contextmenu', (e) => {
+      if (!isAllowed(e.target)) {
+        e.preventDefault();
+        showToast('🛡️ Klik kanan dinonaktifkan');
+        return false;
+      }
+    });
+
+    // 2. Blokir shortcut keyboard
+    document.addEventListener('keydown', (e) => {
+      // Ctrl+Enter tetap boleh (buat hitung)
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') return;
+
+      const k = (e.key || '').toLowerCase();
+
+      // F12 (DevTools)
+      if (e.key === 'F12') {
+        e.preventDefault();
+        showToast('🛡️ Developer Tools tidak diizinkan');
+        return false;
+      }
+
+      // Ctrl+Shift+I / J / C (DevTools Chrome/Edge/Firefox)
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && ['i','j','c'].includes(k)) {
+        e.preventDefault();
+        showToast('🛡️ Developer Tools tidak diizinkan');
+        return false;
+      }
+
+      // Ctrl+U (View Source)
+      if ((e.ctrlKey || e.metaKey) && k === 'u') {
+        e.preventDefault();
+        showToast('🛡️ View Source dinonaktifkan');
+        return false;
+      }
+
+      // Ctrl+S (Save Page)
+      if ((e.ctrlKey || e.metaKey) && k === 's') {
+        e.preventDefault();
+        showToast('🛡️ Save Page dinonaktifkan');
+        return false;
+      }
+
+      // Ctrl+P (Print)
+      if ((e.ctrlKey || e.metaKey) && k === 'p') {
+        e.preventDefault();
+        showToast('🛡️ Print dinonaktifkan');
+        return false;
+      }
+
+      // Kalau target di area allowed → skip blok copy/select-all
+      if (isAllowed(e.target)) return;
+
+      // Ctrl+C (Copy)
+      if ((e.ctrlKey || e.metaKey) && k === 'c') {
+        e.preventDefault();
+        showToast('🛡️ Copy dinonaktifkan. Gunakan tombol "Copy Hasil"');
+        return false;
+      }
+
+      // Ctrl+A (Select All)
+      if ((e.ctrlKey || e.metaKey) && k === 'a') {
+        e.preventDefault();
+        showToast('🛡️ Select All dinonaktifkan');
+        return false;
+      }
+
+      // Ctrl+X (Cut)
+      if ((e.ctrlKey || e.metaKey) && k === 'x') {
+        e.preventDefault();
+        showToast('🛡️ Cut dinonaktifkan');
+        return false;
+      }
+    });
+
+    // 3. Blokir drag teks
+    document.addEventListener('dragstart', (e) => {
+      if (!isAllowed(e.target)) e.preventDefault();
+    });
+
+    // 4. Blokir copy event (khusus yang bukan dari area allowed)
+    document.addEventListener('copy', (e) => {
+      if (!isAllowed(e.target)) {
+        e.preventDefault();
+        showToast('🛡️ Copy dinonaktifkan. Gunakan tombol "Copy Hasil"');
+      }
+    });
+
+    // 5. Blokir cut event di luar area input
+    document.addEventListener('cut', (e) => {
+      if (!isAllowed(e.target)) {
+        e.preventDefault();
+        showToast('🛡️ Cut dinonaktifkan');
+      }
+    });
+
+    // 6. Blokir selectstart (pilih teks via mouse)
+    document.addEventListener('selectstart', (e) => {
+      if (!isAllowed(e.target)) e.preventDefault();
+    });
+  })();
 
   /* ============================================================
      PARTICLE NETWORK
@@ -1685,7 +1834,7 @@
         btn.innerHTML = original;
       }, 1800);
     }).catch(() => {
-      alert('Gagal copy, coba manual ya bre.');
+      showToast('⚠️ Gagal copy, coba manual ya bre');
     });
   }
 
