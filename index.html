@@ -27,8 +27,6 @@
     --gold-bright: #e8c252;
     --gold-soft: rgba(212, 175, 55, 0.12);
     --gold-line: rgba(212, 175, 55, 0.35);
-    --gold-glow: rgba(212, 175, 55, 0.5);
-    --accent-glow: rgba(16, 185, 129, 0.5);
     --accent-soft: rgba(16, 185, 129, 0.1);
     --danger: #f85149;
     --danger-soft: rgba(248, 81, 73, 0.1);
@@ -67,6 +65,12 @@
     -ms-user-select: text;
     user-select: text;
   }
+
+  /* ============================================================
+     BACKGROUND LAYERS
+  ============================================================ */
+
+  /* Aurora */
   body::before {
     content: '';
     position: fixed;
@@ -75,7 +79,7 @@
       radial-gradient(ellipse 50% 40% at 20% 20%, rgba(16, 185, 129, 0.12), transparent 65%),
       radial-gradient(ellipse 50% 40% at 80% 30%, rgba(139, 92, 246, 0.08), transparent 65%),
       radial-gradient(ellipse 60% 50% at 50% 80%, rgba(212, 175, 55, 0.08), transparent 65%);
-    z-index: -5;
+    z-index: -6;
     animation: auroraShift 30s ease-in-out infinite alternate;
     pointer-events: none;
   }
@@ -84,41 +88,48 @@
     50% { transform: translate(2%, -1.5%) scale(1.03); }
     100% { transform: translate(-1.5%, 2%) scale(1.01); }
   }
+
+  /* Orbs */
   .orb {
     position: fixed;
     border-radius: 50%;
     filter: blur(100px);
     opacity: 0.22;
     pointer-events: none;
-    z-index: -4;
+    z-index: -5;
   }
-  .orb-1 {
-    top: 10%; left: 5%;
-    width: 340px; height: 340px;
-    background: #10b981;
-    animation: float1 26s ease-in-out infinite;
-  }
-  .orb-2 {
-    bottom: 5%; right: 10%;
-    width: 380px; height: 380px;
-    background: #d4af37;
-    animation: float2 32s ease-in-out infinite;
-  }
-  @keyframes float1 {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    50% { transform: translate(40px, -30px) scale(1.08); }
-  }
-  @keyframes float2 {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    50% { transform: translate(-40px, 30px) scale(1.06); }
-  }
-  #particles {
+  .orb-1 { top: 10%; left: 5%; width: 340px; height: 340px; background: #10b981; animation: float1 26s ease-in-out infinite; }
+  .orb-2 { bottom: 5%; right: 10%; width: 380px; height: 380px; background: #d4af37; animation: float2 32s ease-in-out infinite; }
+  @keyframes float1 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(40px,-30px) scale(1.08); } }
+  @keyframes float2 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(-40px,30px) scale(1.06); } }
+
+  /* 🆕 BOKEH LIGHT LEAKS */
+  .bokeh {
     position: fixed;
     inset: 0;
-    z-index: -3;
     pointer-events: none;
-    opacity: 0.4;
+    z-index: -4;
+    overflow: hidden;
   }
+  .bokeh .b {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(30px);
+    animation: bokehFloat linear infinite;
+    opacity: 0;
+  }
+  @keyframes bokehFloat {
+    0% { opacity: 0; transform: translateY(20px) scale(0.8); }
+    15% { opacity: 0.5; }
+    50% { opacity: 0.7; }
+    85% { opacity: 0.4; }
+    100% { opacity: 0; transform: translateY(-60px) scale(1.1); }
+  }
+
+  /* Particles */
+  #particles { position: fixed; inset: 0; z-index: -3; pointer-events: none; opacity: 0.4; }
+
+  /* Dot grid */
   body::after {
     content: '';
     position: fixed;
@@ -130,6 +141,8 @@
     -webkit-mask-image: radial-gradient(ellipse 90% 80% at 50% 30%, black 20%, transparent 90%);
     pointer-events: none;
   }
+
+  /* Grain */
   .grain {
     position: fixed;
     inset: 0;
@@ -141,12 +154,31 @@
     animation: grainShift 12s steps(8) infinite;
   }
   @keyframes grainShift {
-    0% { transform: translate(0, 0); }
-    25% { transform: translate(-2%, 3%); }
-    50% { transform: translate(2%, -3%); }
-    75% { transform: translate(-3%, 2%); }
-    100% { transform: translate(0, 0); }
+    0% { transform: translate(0,0); }
+    25% { transform: translate(-2%,3%); }
+    50% { transform: translate(2%,-3%); }
+    75% { transform: translate(-3%,2%); }
+    100% { transform: translate(0,0); }
   }
+
+  /* 🆕 CURSOR SPOTLIGHT */
+  .cursor-glow {
+    position: fixed;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(16,185,129,0.10) 0%, rgba(212,175,55,0.05) 30%, transparent 65%);
+    pointer-events: none;
+    z-index: -1;
+    transform: translate(-50%, -50%);
+    transition: opacity 0.4s;
+    mix-blend-mode: screen;
+    filter: blur(30px);
+    opacity: 0;
+  }
+  .cursor-glow.on { opacity: 1; }
+
+  /* Toast */
   .toast {
     position: fixed;
     bottom: 24px;
@@ -172,43 +204,73 @@
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
   /* ============================================================
-     CARD — GLOW BREATHING PREMIUM
+     CARD WRAPPER + IRIDESCENT RING
+  ============================================================ */
+  .card-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 720px;
+    z-index: 1;
+  }
+
+  /* 🆕 IRIDESCENT ROTATING RING */
+  .card-wrap .ring {
+    position: absolute;
+    inset: -4px;
+    border-radius: 28px;
+    background: conic-gradient(from 0deg,
+      rgba(212, 175, 55, 0.9),
+      rgba(139, 92, 246, 0.7),
+      rgba(6, 182, 212, 0.8),
+      rgba(16, 185, 129, 0.9),
+      rgba(212, 175, 55, 0.9));
+    filter: blur(16px);
+    opacity: 0.35;
+    animation: ringRotate 18s linear infinite;
+    z-index: 0;
+    pointer-events: none;
+  }
+  @keyframes ringRotate { to { transform: rotate(360deg); } }
+
+  /* ============================================================
+     CARD — METAL BEVEL + BREATHING GLOW
   ============================================================ */
   .card {
     position: relative;
-    background: linear-gradient(180deg, rgba(20, 26, 35, 0.94) 0%, rgba(14, 18, 26, 0.98) 100%);
+    background: linear-gradient(180deg, rgba(22, 28, 38, 0.96) 0%, rgba(14, 18, 26, 0.99) 100%);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-radius: 24px;
     padding: 0;
     width: 100%;
-    max-width: 720px;
     z-index: 1;
     overflow: hidden;
     animation: cardGlow 5s ease-in-out infinite;
   }
-
-  /* Card breathing glow — emerald + gold */
   @keyframes cardGlow {
     0%, 100% {
       box-shadow:
-        inset 0 0 0 1px rgba(255, 255, 255, 0.03),
-        inset 0 1px 0 rgba(255, 255, 255, 0.06),
-        0 1px 2px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.14),
+        inset 0 2px 0 rgba(255, 255, 255, 0.04),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.55),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.035),
+        0 1px 2px rgba(0, 0, 0, 0.5),
         0 12px 32px rgba(0, 0, 0, 0.5),
         0 40px 100px rgba(0, 0, 0, 0.65),
-        0 0 100px rgba(16, 185, 129, 0.08),
-        0 0 180px rgba(212, 175, 55, 0.05);
+        0 0 100px rgba(16, 185, 129, 0.10),
+        0 0 180px rgba(212, 175, 55, 0.06);
     }
     50% {
       box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.18),
+        inset 0 2px 0 rgba(255, 255, 255, 0.06),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.55),
         inset 0 0 0 1px rgba(255, 255, 255, 0.05),
-        inset 0 1px 0 rgba(255, 255, 255, 0.08),
-        0 1px 2px rgba(0, 0, 0, 0.4),
+        0 1px 2px rgba(0, 0, 0, 0.5),
         0 12px 32px rgba(0, 0, 0, 0.5),
         0 40px 100px rgba(0, 0, 0, 0.65),
-        0 0 160px rgba(16, 185, 129, 0.22),
-        0 0 240px rgba(212, 175, 55, 0.14);
+        0 0 160px rgba(16, 185, 129, 0.24),
+        0 0 240px rgba(212, 175, 55, 0.16);
     }
   }
 
@@ -222,17 +284,17 @@
     height: 1px;
     background: linear-gradient(90deg,
       transparent 0%,
-      rgba(212, 175, 55, 0.7) 30%,
+      rgba(212, 175, 55, 0.75) 30%,
       rgba(232, 194, 82, 1) 50%,
-      rgba(212, 175, 55, 0.7) 70%,
+      rgba(212, 175, 55, 0.75) 70%,
       transparent 100%);
-    z-index: 5;
+    z-index: 8;
     pointer-events: none;
     animation: lineGlow 3s ease-in-out infinite;
   }
   @keyframes lineGlow {
     0%, 100% { box-shadow: 0 0 8px rgba(212, 175, 55, 0.4), 0 0 20px rgba(212, 175, 55, 0.15); }
-    50% { box-shadow: 0 0 16px rgba(212, 175, 55, 0.8), 0 0 40px rgba(212, 175, 55, 0.35); }
+    50% { box-shadow: 0 0 16px rgba(212, 175, 55, 0.85), 0 0 40px rgba(212, 175, 55, 0.4); }
   }
 
   /* Gold bottom hairline */
@@ -243,11 +305,8 @@
     left: 25%;
     right: 25%;
     height: 1px;
-    background: linear-gradient(90deg,
-      transparent 0%,
-      rgba(212, 175, 55, 0.3) 50%,
-      transparent 100%);
-    z-index: 5;
+    background: linear-gradient(90deg, transparent 0%, rgba(212, 175, 55, 0.35) 50%, transparent 100%);
+    z-index: 8;
     pointer-events: none;
   }
 
@@ -257,8 +316,8 @@
     width: 24px;
     height: 24px;
     pointer-events: none;
-    z-index: 6;
-    opacity: 0.65;
+    z-index: 9;
+    opacity: 0.7;
   }
   .card .corner::before,
   .card .corner::after {
@@ -282,27 +341,27 @@
   .card .corner.br::before { bottom: 0; right: 0; }
   .card .corner.br::after { bottom: 0; right: 0; }
 
-  /* Corner light glow — 4 titik di sudut yang nafas */
+  /* Corner lights */
   .corner-light {
     position: absolute;
-    width: 200px;
-    height: 200px;
+    width: 220px;
+    height: 220px;
     border-radius: 50%;
     pointer-events: none;
     z-index: 2;
     filter: blur(60px);
     opacity: 0.35;
   }
-  .corner-light.tl { top: -100px; left: -100px; background: radial-gradient(circle, rgba(16, 185, 129, 0.6), transparent 70%); animation: lightBreath 4s ease-in-out infinite; }
-  .corner-light.tr { top: -100px; right: -100px; background: radial-gradient(circle, rgba(212, 175, 55, 0.55), transparent 70%); animation: lightBreath 4s ease-in-out infinite 1s; }
-  .corner-light.bl { bottom: -100px; left: -100px; background: radial-gradient(circle, rgba(212, 175, 55, 0.45), transparent 70%); animation: lightBreath 4s ease-in-out infinite 2s; }
-  .corner-light.br { bottom: -100px; right: -100px; background: radial-gradient(circle, rgba(16, 185, 129, 0.5), transparent 70%); animation: lightBreath 4s ease-in-out infinite 3s; }
+  .corner-light.tl { top: -110px; left: -110px; background: radial-gradient(circle, rgba(16, 185, 129, 0.7), transparent 70%); animation: lightBreath 4s ease-in-out infinite; }
+  .corner-light.tr { top: -110px; right: -110px; background: radial-gradient(circle, rgba(212, 175, 55, 0.6), transparent 70%); animation: lightBreath 4s ease-in-out infinite 1s; }
+  .corner-light.bl { bottom: -110px; left: -110px; background: radial-gradient(circle, rgba(212, 175, 55, 0.5), transparent 70%); animation: lightBreath 4s ease-in-out infinite 2s; }
+  .corner-light.br { bottom: -110px; right: -110px; background: radial-gradient(circle, rgba(16, 185, 129, 0.55), transparent 70%); animation: lightBreath 4s ease-in-out infinite 3s; }
   @keyframes lightBreath {
     0%, 100% { opacity: 0.2; transform: scale(1); }
-    50% { opacity: 0.55; transform: scale(1.15); }
+    50% { opacity: 0.6; transform: scale(1.18); }
   }
 
-  /* Scan line — gold, 1 arah turun */
+  /* Scan line */
   .card .scan {
     position: absolute;
     left: 0; right: 0;
@@ -311,19 +370,19 @@
     background: linear-gradient(90deg,
       transparent 0%,
       rgba(212, 175, 55, 0.25) 25%,
-      rgba(232, 194, 82, 0.65) 50%,
+      rgba(232, 194, 82, 0.7) 50%,
       rgba(212, 175, 55, 0.25) 75%,
       transparent 100%);
     animation: scanY 16s linear infinite;
     pointer-events: none;
-    z-index: 8;
+    z-index: 10;
     opacity: 0;
-    box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.55);
   }
   @keyframes scanY {
     0%   { top: 4%; opacity: 0; }
-    4%   { top: 4%; opacity: 0.75; }
-    45%  { top: 96%; opacity: 0.75; }
+    4%   { top: 4%; opacity: 0.8; }
+    45%  { top: 96%; opacity: 0.8; }
     48%  { top: 96%; opacity: 0; }
     100% { top: 4%; opacity: 0; }
   }
@@ -335,8 +394,8 @@
     position: relative;
     padding: 40px 40px 32px;
     background:
-      radial-gradient(ellipse 80% 100% at 20% 0%, rgba(16, 185, 129, 0.08), transparent 60%),
-      radial-gradient(ellipse 60% 100% at 90% 100%, rgba(212, 175, 55, 0.06), transparent 60%);
+      radial-gradient(ellipse 80% 100% at 20% 0%, rgba(16, 185, 129, 0.09), transparent 60%),
+      radial-gradient(ellipse 60% 100% at 90% 100%, rgba(212, 175, 55, 0.07), transparent 60%);
     border-bottom: 1px solid var(--border);
     overflow: hidden;
   }
@@ -354,53 +413,77 @@
 
   .hero-top { display: flex; align-items: center; gap: 18px; position: relative; z-index: 1; margin-bottom: 28px; }
 
+  /* Logo + HOLOGRAPHIC FOIL */
   .logo {
     flex-shrink: 0;
     width: 60px; height: 60px;
     border-radius: 16px;
     background:
-      radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.12), transparent 50%),
-      linear-gradient(135deg, rgba(16,185,129,0.16), rgba(212,175,55,0.14));
-    border: 1px solid rgba(212, 175, 55, 0.32);
+      radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.14), transparent 50%),
+      linear-gradient(135deg, rgba(16,185,129,0.18), rgba(212,175,55,0.16));
+    border: 1px solid rgba(212, 175, 55, 0.35);
     display: flex; align-items: center; justify-content: center;
-    box-shadow:
-      0 0 28px rgba(16, 185, 129, 0.18),
-      0 0 70px rgba(212, 175, 55, 0.12),
-      inset 0 1px 0 rgba(255, 255, 255, 0.1),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.2);
     position: relative;
     overflow: hidden;
     animation: logoGlow 4s ease-in-out infinite;
   }
   @keyframes logoGlow {
-    0%, 100% { box-shadow: 0 0 28px rgba(16, 185, 129, 0.18), 0 0 70px rgba(212, 175, 55, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 -1px 0 rgba(0, 0, 0, 0.2); }
-    50% { box-shadow: 0 0 40px rgba(16, 185, 129, 0.35), 0 0 100px rgba(212, 175, 55, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.12), inset 0 -1px 0 rgba(0, 0, 0, 0.2); }
+    0%, 100% { box-shadow: 0 0 28px rgba(16, 185, 129, 0.2), 0 0 70px rgba(212, 175, 55, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.12), inset 0 -1px 0 rgba(0, 0, 0, 0.25); }
+    50% { box-shadow: 0 0 44px rgba(16, 185, 129, 0.38), 0 0 110px rgba(212, 175, 55, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.14), inset 0 -1px 0 rgba(0, 0, 0, 0.25); }
   }
+  /* 🆕 HOLOGRAPHIC FOIL layer */
+  .logo::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at var(--mx, 30%) var(--my, 30%),
+      rgba(255, 255, 255, 0.5) 0%,
+      rgba(139, 92, 246, 0.35) 15%,
+      rgba(6, 182, 212, 0.3) 30%,
+      rgba(212, 175, 55, 0.35) 50%,
+      rgba(16, 185, 129, 0.3) 70%,
+      transparent 85%);
+    mix-blend-mode: overlay;
+    opacity: 0;
+    transition: opacity 0.4s;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .logo:hover::before { opacity: 1; }
   .logo::after {
     content: '';
     position: absolute; inset: 0;
     background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,0.22) 50%, transparent 70%);
     animation: shine 4s ease-in-out infinite;
+    z-index: 1;
   }
   @keyframes shine { 0%,100% { transform: translateX(-100%); } 50% { transform: translateX(100%); } }
-  .logo svg { width: 36px; height: 36px; position: relative; z-index: 1; }
+  .logo svg { width: 36px; height: 36px; position: relative; z-index: 3; }
 
   .title-block { flex: 1; min-width: 0; }
 
+  /* Title + HOLOGRAPHIC */
   .hero h1 {
     font-size: 27px;
     font-weight: 800;
     letter-spacing: -0.035em;
     margin-bottom: 8px;
-    background: linear-gradient(90deg, #ffffff 0%, #e8e4d3 30%, #d4af37 55%, #10b981 85%);
-    background-size: 240% 100%;
+    background: linear-gradient(90deg,
+      #ffffff 0%,
+      #e8e4d3 20%,
+      #d4af37 40%,
+      #c4b5fd 55%,
+      #67e8f9 70%,
+      #10b981 85%,
+      #ffffff 100%);
+    background-size: 300% 100%;
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
     animation: shimmerText 10s ease-in-out infinite;
     line-height: 1.15;
     display: inline-block;
-    filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.15));
+    filter: drop-shadow(0 0 22px rgba(212, 175, 55, 0.2));
   }
   .hero h1::after {
     content: '';
@@ -411,7 +494,7 @@
     margin-left: 5px;
     vertical-align: text-bottom;
     animation: cursorBlink 1.6s steps(2) infinite;
-    box-shadow: 0 0 14px rgba(212, 175, 55, 0.8), 0 0 28px rgba(212, 175, 55, 0.4);
+    box-shadow: 0 0 14px rgba(212, 175, 55, 0.9), 0 0 28px rgba(212, 175, 55, 0.45);
   }
   @keyframes cursorBlink { 0%,55% { opacity: 1; } 56%,100% { opacity: 0; } }
   @keyframes shimmerText { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
@@ -431,15 +514,42 @@
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--gold-bright);
-    background: linear-gradient(135deg, rgba(212, 175, 55, 0.18), rgba(212, 175, 55, 0.08));
-    border: 1px solid rgba(212, 175, 55, 0.45);
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(212, 175, 55, 0.08));
+    border: 1px solid rgba(212, 175, 55, 0.5);
     border-radius: 4px;
     animation: badgeGlow 3s ease-in-out infinite;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
   }
   @keyframes badgeGlow {
     0%, 100% { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 0 10px rgba(212, 175, 55, 0.15); }
-    50% { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 0 20px rgba(212, 175, 55, 0.35); }
+    50% { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 0 22px rgba(212, 175, 55, 0.4); }
+  }
+
+  /* 🆕 MOOD RING */
+  .mood-ring {
+    position: absolute;
+    top: 22px;
+    right: 22px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 10px #10b981, 0 0 20px rgba(16,185,129,0.5), 0 0 0 3px rgba(16,185,129,0.15);
+    z-index: 5;
+    transition: background 0.4s, box-shadow 0.4s;
+    animation: moodPulse 2.2s ease-in-out infinite;
+  }
+  .mood-ring.warn {
+    background: #e3b341;
+    box-shadow: 0 0 10px #e3b341, 0 0 22px rgba(227,179,65,0.55), 0 0 0 3px rgba(227,179,65,0.18);
+  }
+  .mood-ring.danger {
+    background: #f85149;
+    box-shadow: 0 0 10px #f85149, 0 0 22px rgba(248,81,73,0.55), 0 0 0 3px rgba(248,81,73,0.18);
+  }
+  @keyframes moodPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.15); opacity: 0.75; }
   }
 
   /* Live bar */
@@ -454,16 +564,25 @@
     gap: 6px;
     position: relative;
     overflow: hidden;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
-    transition: border-color 0.3s, background 0.3s;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.05),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+    transition: border-color 0.3s, background 0.3s, box-shadow 0.3s;
   }
-  .live-chip:hover { border-color: rgba(212, 175, 55, 0.35); background: rgba(10, 14, 20, 0.8); }
+  .live-chip:hover {
+    border-color: rgba(212, 175, 55, 0.4);
+    background: rgba(10, 14, 20, 0.8);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+      0 0 20px rgba(212, 175, 55, 0.15);
+  }
   .live-chip::before {
     content: '';
     position: absolute;
     top: 0; left: 0; right: 0;
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.7), transparent);
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.8), transparent);
     animation: chipLine 3s ease-in-out infinite;
   }
   @keyframes chipLine {
@@ -485,22 +604,23 @@
     letter-spacing: -0.02em;
     font-feature-settings: 'tnum' 1;
     transition: color 0.3s;
+    text-shadow: 0 1px 0 rgba(0,0,0,0.6);
   }
   .live-chip-value.accent {
     color: var(--accent);
     animation: numGlow 2.5s ease-in-out infinite;
   }
   @keyframes numGlow {
-    0%, 100% { text-shadow: 0 0 14px rgba(16, 185, 129, 0.4), 0 0 30px rgba(16, 185, 129, 0.15); }
-    50% { text-shadow: 0 0 22px rgba(16, 185, 129, 0.8), 0 0 44px rgba(16, 185, 129, 0.4); }
+    0%, 100% { text-shadow: 0 1px 0 rgba(0,0,0,0.6), 0 0 14px rgba(16, 185, 129, 0.4), 0 0 30px rgba(16, 185, 129, 0.15); }
+    50% { text-shadow: 0 1px 0 rgba(0,0,0,0.6), 0 0 22px rgba(16, 185, 129, 0.85), 0 0 44px rgba(16, 185, 129, 0.4); }
   }
 
   /* Notice */
   .notice {
     margin: 24px 40px 0;
     padding: 15px 18px;
-    background: linear-gradient(135deg, rgba(227,179,65,0.08) 0%, rgba(227,179,65,0.02) 100%);
-    border: 1px solid rgba(227, 179, 65, 0.22);
+    background: linear-gradient(135deg, rgba(227,179,65,0.09) 0%, rgba(227,179,65,0.02) 100%);
+    border: 1px solid rgba(227, 179, 65, 0.24);
     border-left: 2px solid var(--warn);
     border-radius: 12px;
     display: flex;
@@ -508,14 +628,14 @@
     align-items: flex-start;
     position: relative;
     z-index: 1;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
   }
   .notice-icon {
     flex-shrink: 0;
     width: 26px; height: 26px;
     border-radius: 7px;
     background: var(--warn-soft);
-    border: 1px solid rgba(227, 179, 65, 0.25);
+    border: 1px solid rgba(227, 179, 65, 0.28);
     display: flex; align-items: center; justify-content: center;
     margin-top: 1px;
     animation: noticePulse 2.5s ease-in-out infinite;
@@ -539,6 +659,41 @@
     color: var(--text-dim);
     line-height: 1.65;
     letter-spacing: 0.005em;
+  }
+
+  /* ============================================================
+     🆕 ORNAMENTAL DIVIDER
+  ============================================================ */
+  .ornament {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin: 26px 40px;
+    color: rgba(212, 175, 55, 0.6);
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    position: relative;
+    z-index: 1;
+  }
+  .ornament::before,
+  .ornament::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.4), transparent);
+  }
+  .ornament .diamond {
+    width: 5px;
+    height: 5px;
+    background: var(--gold);
+    transform: rotate(45deg);
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.6);
+    animation: diamondSpin 6s linear infinite;
+  }
+  @keyframes diamondSpin {
+    0%, 100% { transform: rotate(45deg) scale(1); opacity: 1; }
+    50% { transform: rotate(225deg) scale(1.3); opacity: 0.8; }
   }
 
   /* Body */
@@ -570,6 +725,7 @@
     transition: border-color 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
     width: 100%;
     font-feature-settings: 'tnum' 1;
+    box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.2);
   }
   input:hover, select:hover, textarea:hover { border-color: #4a5460; }
   input:focus, select:focus, textarea:focus {
@@ -577,8 +733,8 @@
     background: rgba(10, 14, 20, 0.9);
     box-shadow:
       0 0 0 3px rgba(212, 175, 55, 0.14),
-      0 0 28px rgba(212, 175, 55, 0.22),
-      inset 0 1px 0 rgba(255, 255, 255, 0.03);
+      0 0 28px rgba(212, 175, 55, 0.24),
+      inset 0 1px 0 rgba(0, 0, 0, 0.2);
   }
   select {
     cursor: pointer;
@@ -612,7 +768,7 @@
     border: 1px solid var(--gold-line);
     border-radius: 5px;
     letter-spacing: 0.08em;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 0 12px rgba(212, 175, 55, 0.15);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 0 14px rgba(212, 175, 55, 0.18);
   }
   .leg {
     display: flex;
@@ -627,7 +783,9 @@
     position: relative;
     overflow: hidden;
     animation: legIn 0.45s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.03),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.25);
   }
   @keyframes legIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
   .leg::before {
@@ -639,29 +797,30 @@
     transition: background 0.3s, box-shadow 0.3s;
   }
   .leg:hover {
-    border-color: rgba(212, 175, 55, 0.35);
+    border-color: rgba(212, 175, 55, 0.4);
     background: var(--surface-2);
     box-shadow:
-      0 0 28px rgba(212, 175, 55, 0.10),
-      inset 0 1px 0 rgba(255, 255, 255, 0.03);
+      inset 0 1px 0 rgba(255, 255, 255, 0.05),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.25),
+      0 0 28px rgba(212, 175, 55, 0.12);
   }
   .leg:hover::before {
     background: linear-gradient(180deg, var(--gold-bright), var(--accent));
-    box-shadow: 0 0 14px rgba(212, 175, 55, 0.6);
+    box-shadow: 0 0 14px rgba(212, 175, 55, 0.65);
   }
   .leg-num {
     flex-shrink: 0;
     width: 28px; height: 28px;
     border-radius: 7px;
-    background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(212, 175, 55, 0.03));
-    border: 1px solid rgba(212, 175, 55, 0.25);
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.12), rgba(212, 175, 55, 0.03));
+    border: 1px solid rgba(212, 175, 55, 0.3);
     color: var(--gold-bright);
     font-family: 'JetBrains Mono', monospace;
     font-size: 11px;
     font-weight: 700;
     display: flex; align-items: center; justify-content: center;
     font-feature-settings: 'tnum' 1;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 0 10px rgba(212, 175, 55, 0.15);
   }
   .leg input.odds { flex: 1; min-width: 0; }
   .leg select.result-type { width: 140px; flex-shrink: 0; font-family: 'Inter', sans-serif; font-feature-settings: normal; }
@@ -704,8 +863,8 @@
     box-shadow:
       0 4px 18px rgba(16, 185, 129, 0.3),
       0 0 40px rgba(16, 185, 129, 0.12),
-      0 1px 0 rgba(255, 255, 255, 0.25) inset,
-      0 -1px 0 rgba(0, 0, 0, 0.2) inset;
+      0 1px 0 rgba(255, 255, 255, 0.28) inset,
+      0 -2px 0 rgba(0, 0, 0, 0.25) inset;
     letter-spacing: 0.03em;
     display: flex;
     align-items: center;
@@ -714,8 +873,8 @@
     animation: btnBreath 3s ease-in-out infinite;
   }
   @keyframes btnBreath {
-    0%, 100% { box-shadow: 0 4px 18px rgba(16, 185, 129, 0.3), 0 0 40px rgba(16, 185, 129, 0.12), 0 1px 0 rgba(255, 255, 255, 0.25) inset, 0 -1px 0 rgba(0, 0, 0, 0.2) inset; }
-    50% { box-shadow: 0 4px 22px rgba(16, 185, 129, 0.45), 0 0 60px rgba(16, 185, 129, 0.22), 0 1px 0 rgba(255, 255, 255, 0.28) inset, 0 -1px 0 rgba(0, 0, 0, 0.2) inset; }
+    0%, 100% { box-shadow: 0 4px 18px rgba(16, 185, 129, 0.3), 0 0 40px rgba(16, 185, 129, 0.12), 0 1px 0 rgba(255, 255, 255, 0.28) inset, 0 -2px 0 rgba(0, 0, 0, 0.25) inset; }
+    50% { box-shadow: 0 4px 22px rgba(16, 185, 129, 0.5), 0 0 60px rgba(16, 185, 129, 0.25), 0 1px 0 rgba(255, 255, 255, 0.3) inset, 0 -2px 0 rgba(0, 0, 0, 0.25) inset; }
   }
   .btn-primary svg { width: 15px; height: 15px; }
   .btn-primary::before {
@@ -730,9 +889,9 @@
   .btn-primary:hover {
     box-shadow:
       0 14px 40px rgba(16, 185, 129, 0.5),
-      0 0 80px rgba(16, 185, 129, 0.28),
-      0 1px 0 rgba(255, 255, 255, 0.3) inset,
-      0 -1px 0 rgba(0, 0, 0, 0.2) inset;
+      0 0 80px rgba(16, 185, 129, 0.3),
+      0 1px 0 rgba(255, 255, 255, 0.32) inset,
+      0 -2px 0 rgba(0, 0, 0, 0.25) inset;
     transform: translateY(-1px);
   }
   .btn-primary:active { transform: translateY(0) scale(0.99); }
@@ -748,9 +907,10 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03), inset 0 -1px 0 rgba(0, 0, 0, 0.25);
   }
   .btn-secondary svg { width: 13px; height: 13px; }
-  .btn-secondary:hover { background: #232b36; color: var(--text); border-color: var(--gold-line); box-shadow: 0 0 20px rgba(212, 175, 55, 0.12); }
+  .btn-secondary:hover { background: #232b36; color: var(--text); border-color: var(--gold-line); box-shadow: 0 0 22px rgba(212, 175, 55, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.03); }
 
   .btn-remove {
     background: transparent;
@@ -763,7 +923,7 @@
     line-height: 1;
     transition: transform 0.25s, color 0.18s, border-color 0.18s, background 0.18s, box-shadow 0.18s;
   }
-  .btn-remove:hover { color: var(--danger); border-color: var(--danger); background: var(--danger-soft); transform: rotate(90deg); box-shadow: 0 0 14px rgba(248, 81, 73, 0.35); }
+  .btn-remove:hover { color: var(--danger); border-color: var(--danger); background: var(--danger-soft); transform: rotate(90deg); box-shadow: 0 0 14px rgba(248, 81, 73, 0.4); }
 
   /* Result */
   .result {
@@ -777,7 +937,7 @@
     overflow: hidden;
     animation: resultIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     padding: 26px;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03), inset 0 -1px 0 rgba(0, 0, 0, 0.3);
   }
   @keyframes resultIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
   .result::before {
@@ -785,7 +945,7 @@
     position: absolute;
     top: 0; left: 18%; right: 18%;
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.7), transparent);
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.75), transparent);
     animation: lineGlow 3s ease-in-out infinite;
   }
   .result-hero {
@@ -806,6 +966,7 @@
     text-transform: uppercase;
     margin-bottom: 9px;
   }
+  /* 🆕 EMBOSSED NUMBER */
   .result-hero-value {
     font-family: 'JetBrains Mono', monospace;
     font-size: 38px;
@@ -820,26 +981,26 @@
     animation: shimmerText 8s ease-in-out infinite;
     display: inline-block;
     font-feature-settings: 'tnum' 1;
-    filter: drop-shadow(0 0 22px rgba(212, 175, 55, 0.35));
+    filter: drop-shadow(0 1px 0 rgba(255,255,255,0.1)) drop-shadow(0 -1px 1px rgba(0,0,0,0.7)) drop-shadow(0 0 22px rgba(212, 175, 55, 0.4));
   }
   .result-hero-icon {
     width: 58px; height: 58px;
     border-radius: 15px;
     background:
-      radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.1), transparent 50%),
-      linear-gradient(135deg, rgba(16, 185, 129, 0.16), rgba(212, 175, 55, 0.14));
-    border: 1px solid rgba(212, 175, 55, 0.32);
+      radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.12), transparent 50%),
+      linear-gradient(135deg, rgba(16, 185, 129, 0.18), rgba(212, 175, 55, 0.16));
+    border: 1px solid rgba(212, 175, 55, 0.38);
     display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
     box-shadow:
-      0 0 28px rgba(16, 185, 129, 0.2),
-      0 0 60px rgba(212, 175, 55, 0.1),
-      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      0 0 28px rgba(16, 185, 129, 0.22),
+      0 0 60px rgba(212, 175, 55, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
     animation: iconGlow 4s ease-in-out infinite;
   }
   @keyframes iconGlow {
-    0%, 100% { box-shadow: 0 0 28px rgba(16, 185, 129, 0.2), 0 0 60px rgba(212, 175, 55, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.08); }
-    50% { box-shadow: 0 0 40px rgba(16, 185, 129, 0.35), 0 0 90px rgba(212, 175, 55, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1); }
+    0%, 100% { box-shadow: 0 0 28px rgba(16, 185, 129, 0.22), 0 0 60px rgba(212, 175, 55, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.1); }
+    50% { box-shadow: 0 0 44px rgba(16, 185, 129, 0.4), 0 0 90px rgba(212, 175, 55, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.12); }
   }
   .result-hero-icon svg { width: 24px; height: 24px; }
 
@@ -862,7 +1023,7 @@
   hr { border: none; border-top: 1px solid var(--border); margin: 18px 0; }
   .row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; }
   .row span:first-child { color: var(--muted); font-size: 13px; font-weight: 500; letter-spacing: 0.01em; }
-  .row span:last-child { font-family: 'JetBrains Mono', monospace; font-weight: 600; color: var(--text); font-size: 14px; font-feature-settings: 'tnum' 1; }
+  .row span:last-child { font-family: 'JetBrains Mono', monospace; font-weight: 600; color: var(--text); font-size: 14px; font-feature-settings: 'tnum' 1; text-shadow: 0 1px 0 rgba(0,0,0,0.5); }
   .status-win { color: var(--accent); font-weight: 700; }
   .status-lose { color: var(--danger); font-weight: 700; }
 
@@ -871,27 +1032,23 @@
     padding: 24px;
     border-radius: 14px;
     background:
-      radial-gradient(circle at 20% 20%, rgba(212, 175, 55, 0.07), transparent 50%),
-      linear-gradient(135deg, rgba(16, 185, 129, 0.10) 0%, rgba(212, 175, 55, 0.03) 100%);
-    border: 1px solid rgba(16, 185, 129, 0.28);
+      radial-gradient(circle at 20% 20%, rgba(212, 175, 55, 0.08), transparent 50%),
+      linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(212, 175, 55, 0.03) 100%);
+    border: 1px solid rgba(16, 185, 129, 0.3);
     position: relative;
     overflow: hidden;
     animation: saldoBreath 4s ease-in-out infinite;
   }
   @keyframes saldoBreath {
-    0%, 100% {
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 0 40px rgba(16, 185, 129, 0.06), 0 0 80px rgba(212, 175, 55, 0.03);
-    }
-    50% {
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 0 70px rgba(16, 185, 129, 0.18), 0 0 120px rgba(212, 175, 55, 0.10);
-    }
+    0%, 100% { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 0 40px rgba(16, 185, 129, 0.08), 0 0 80px rgba(212, 175, 55, 0.04); }
+    50% { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07), 0 0 70px rgba(16, 185, 129, 0.22), 0 0 120px rgba(212, 175, 55, 0.12); }
   }
   .saldo-panel::before {
     content: '';
     position: absolute;
     top: 0; left: 15%; right: 15%;
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.7), transparent);
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.75), transparent);
     animation: lineGlow 3s ease-in-out infinite;
   }
   .saldo-panel::after {
@@ -899,7 +1056,7 @@
     position: absolute;
     top: -50%; left: -50%;
     width: 200%; height: 200%;
-    background: conic-gradient(from 0deg, transparent, rgba(212, 175, 55, 0.12), transparent 30%);
+    background: conic-gradient(from 0deg, transparent, rgba(212, 175, 55, 0.14), transparent 30%);
     animation: rotate 14s linear infinite;
     pointer-events: none;
   }
@@ -908,7 +1065,7 @@
     background:
       radial-gradient(circle at 20% 20%, rgba(248, 81, 73, 0.06), transparent 50%),
       linear-gradient(135deg, rgba(248, 81, 73, 0.1) 0%, rgba(248, 81, 73, 0.02) 100%);
-    border-color: rgba(248, 81, 73, 0.3);
+    border-color: rgba(248, 81, 73, 0.32);
   }
   .saldo-panel.lose::before { background: linear-gradient(90deg, transparent, var(--danger), transparent); }
   .saldo-panel.lose::after { background: conic-gradient(from 0deg, transparent, rgba(248, 81, 73, 0.1), transparent 30%); }
@@ -935,6 +1092,7 @@
     0%, 100% { opacity: 1; transform: scale(1); }
     50% { opacity: 0.5; transform: scale(0.85); }
   }
+  /* 🆕 EMBOSSED SALDO VALUE */
   .saldo-value {
     font-family: 'JetBrains Mono', monospace;
     font-size: 36px;
@@ -943,10 +1101,13 @@
     letter-spacing: -0.035em;
     line-height: 1.2;
     position: relative; z-index: 1;
-    text-shadow: 0 0 32px rgba(16, 185, 129, 0.35);
+    text-shadow:
+      0 1px 0 rgba(0, 0, 0, 0.7),
+      0 -1px 0 rgba(255, 255, 255, 0.08),
+      0 0 32px rgba(16, 185, 129, 0.35);
     font-feature-settings: 'tnum' 1;
   }
-  .saldo-value.lose { color: var(--danger); text-shadow: 0 0 32px rgba(248, 81, 73, 0.35); }
+  .saldo-value.lose { color: var(--danger); text-shadow: 0 1px 0 rgba(0, 0, 0, 0.7), 0 -1px 0 rgba(255, 255, 255, 0.08), 0 0 32px rgba(248, 81, 73, 0.35); }
   .saldo-sub { font-size: 12.5px; color: var(--muted); margin-top: 11px; line-height: 1.7; position: relative; z-index: 1; }
   .saldo-sub .highlight { color: var(--accent); font-weight: 700; font-family: 'JetBrains Mono', monospace; font-feature-settings: 'tnum' 1; }
   .saldo-sub .highlight.lose { color: var(--danger); }
@@ -961,10 +1122,11 @@
     font-size: 13px;
     display: flex; align-items: center; justify-content: center;
     gap: 8px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03), inset 0 -1px 0 rgba(0, 0, 0, 0.25);
   }
   .btn-copy svg { width: 14px; height: 14px; }
-  .btn-copy:hover { color: var(--gold-bright); border-color: var(--gold-line); background: var(--gold-soft); box-shadow: 0 0 20px rgba(212, 175, 55, 0.2); }
-  .btn-copy.copied { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); box-shadow: 0 0 20px rgba(16, 185, 129, 0.3); }
+  .btn-copy:hover { color: var(--gold-bright); border-color: var(--gold-line); background: var(--gold-soft); box-shadow: 0 0 22px rgba(212, 175, 55, 0.22); }
+  .btn-copy.copied { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); box-shadow: 0 0 22px rgba(16, 185, 129, 0.35); }
 
   /* Hint */
   .hint {
@@ -977,7 +1139,7 @@
     border-radius: 12px;
     border: 1px solid var(--border);
     position: relative;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03), inset 0 -1px 0 rgba(0, 0, 0, 0.3);
   }
   .hint::before {
     content: '';
@@ -986,7 +1148,7 @@
     width: 2px;
     border-radius: 3px;
     background: linear-gradient(180deg, var(--gold-bright), var(--accent));
-    box-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.45);
   }
   .hint b { color: var(--text-dim); font-weight: 700; font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; display: inline-block; margin-top: 4px; }
   .hint code {
@@ -1010,7 +1172,7 @@
     height: 1px;
     background: linear-gradient(90deg, var(--gold-bright), transparent);
     opacity: 0.9;
-    box-shadow: 0 0 8px rgba(212, 175, 55, 0.5);
+    box-shadow: 0 0 8px rgba(212, 175, 55, 0.55);
     animation: sectionLine 3s ease-in-out infinite;
   }
   @keyframes sectionLine {
@@ -1071,21 +1233,39 @@
   ::-webkit-scrollbar-thumb { background: var(--border-soft); border-radius: 5px; border: 2px solid var(--bg); }
   ::-webkit-scrollbar-thumb:hover { background: #4a5460; }
 
+  /* 🆕 STAGGERED ENTRANCE */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .card-wrap { animation: fadeUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both; }
+  .hero-top { animation: fadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both; }
+  .live-bar { animation: fadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both; }
+  .notice { animation: fadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.5s both; }
+  .body-content > .section:nth-child(1) { animation: fadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.6s both; }
+  .body-content > .section:nth-child(2) { animation: fadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.72s both; }
+  .body-content > .section:nth-child(3) { animation: fadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.84s both; }
+  .body-content > .btn-primary { animation: fadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.96s both, btnBreath 3s ease-in-out infinite 1.6s; }
+  .body-content > .result { animation: resultIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) 1.08s both; }
+  .body-content > .hint { animation: fadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 1.2s both; }
+
   @media (max-width: 620px) {
     body { padding: 16px 12px; }
+    .card-wrap .ring { inset: -2px; border-radius: 20px; filter: blur(12px); }
     .card { border-radius: 18px; }
     .card .corner { width: 16px; height: 16px; }
     .card .corner.tl { top: 8px; left: 8px; }
     .card .corner.tr { top: 8px; right: 8px; }
     .card .corner.bl { bottom: 8px; left: 8px; }
     .card .corner.br { bottom: 8px; right: 8px; }
-    .corner-light { width: 140px; height: 140px; }
+    .corner-light { width: 150px; height: 150px; }
     .hero { padding: 28px 22px 24px; }
     .hero h1 { font-size: 20px; }
     .logo { width: 50px; height: 50px; border-radius: 13px; }
     .logo svg { width: 30px; height: 30px; }
     .notice { margin: 20px 22px 0; padding: 13px 16px; }
     .notice-text { font-size: 12px; }
+    .ornament { margin: 22px 22px; }
     .body-content { padding: 24px 22px 30px; }
     .live-bar { grid-template-columns: repeat(3, 1fr); gap: 6px; }
     .live-chip { padding: 11px 12px; }
@@ -1098,11 +1278,16 @@
     .result-hero-value { font-size: 28px; }
     .saldo-value { font-size: 26px; }
     .toast { font-size: 12px; padding: 10px 16px; bottom: 16px; }
+    .mood-ring { top: 16px; right: 16px; }
+    .cursor-glow { display: none; }
   }
 </style>
 </head>
 <body>
 
+<!-- Background layers -->
+<div class="cursor-glow" id="cursorGlow"></div>
+<div class="bokeh" id="bokeh"></div>
 <div class="orb orb-1"></div>
 <div class="orb orb-2"></div>
 <canvas id="particles"></canvas>
@@ -1110,147 +1295,158 @@
 
 <div class="toast" id="toast"></div>
 
-<div class="card" id="card">
-  <!-- Corner lights -->
-  <div class="corner-light tl"></div>
-  <div class="corner-light tr"></div>
-  <div class="corner-light bl"></div>
-  <div class="corner-light br"></div>
+<!-- CARD WRAPPER -->
+<div class="card-wrap">
+  <div class="ring"></div>
 
-  <!-- Corner brackets -->
-  <div class="corner tl"></div>
-  <div class="corner tr"></div>
-  <div class="corner bl"></div>
-  <div class="corner br"></div>
+  <div class="card" id="card">
+    <!-- Corner lights -->
+    <div class="corner-light tl"></div>
+    <div class="corner-light tr"></div>
+    <div class="corner-light bl"></div>
+    <div class="corner-light br"></div>
 
-  <div class="scan"></div>
+    <!-- Corner brackets -->
+    <div class="corner tl"></div>
+    <div class="corner tr"></div>
+    <div class="corner bl"></div>
+    <div class="corner br"></div>
 
-  <div class="hero">
-    <div class="hero-top">
-      <div class="logo">
-        <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0" stop-color="#10b981"/>
-              <stop offset="1" stop-color="#d4af37"/>
-            </linearGradient>
-          </defs>
-          <path d="M22 46V20h14a9 9 0 0 1 0 18h-7" fill="none" stroke="url(#lg)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-          <circle cx="42" cy="46" r="3.5" fill="#d4af37"/>
-        </svg>
+    <div class="scan"></div>
+
+    <div class="hero">
+      <!-- 🆕 MOOD RING -->
+      <div class="mood-ring" id="moodRing" title="Status"></div>
+
+      <div class="hero-top">
+        <div class="logo" id="logo">
+          <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#10b981"/>
+                <stop offset="1" stop-color="#d4af37"/>
+              </linearGradient>
+            </defs>
+            <path d="M22 46V20h14a9 9 0 0 1 0 18h-7" fill="none" stroke="url(#lg)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="42" cy="46" r="3.5" fill="#d4af37"/>
+          </svg>
+        </div>
+        <div class="title-block">
+          <h1>Mix Parlay Calculator</h1>
+          <div class="sub">
+            <span class="badge">BETA</span>
+            <span>Auto-read odds &amp; status dari bill</span>
+          </div>
+        </div>
       </div>
-      <div class="title-block">
-        <h1>Mix Parlay Calculator</h1>
-        <div class="sub">
-          <span class="badge">BETA</span>
-          <span>Auto-read odds &amp; status dari bill</span>
+
+      <div class="live-bar">
+        <div class="live-chip">
+          <div class="live-chip-label">Legs</div>
+          <div class="live-chip-value" id="liveLegs">0</div>
+        </div>
+        <div class="live-chip">
+          <div class="live-chip-label">Total Odds</div>
+          <div class="live-chip-value accent" id="liveOdds">0.000</div>
+        </div>
+        <div class="live-chip">
+          <div class="live-chip-label">Potensi</div>
+          <div class="live-chip-value" id="livePayout">0.00</div>
         </div>
       </div>
     </div>
 
-    <div class="live-bar">
-      <div class="live-chip">
-        <div class="live-chip-label">Legs</div>
-        <div class="live-chip-value" id="liveLegs">0</div>
+    <div class="notice">
+      <div class="notice-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/>
+          <line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
       </div>
-      <div class="live-chip">
-        <div class="live-chip-label">Total Odds</div>
-        <div class="live-chip-value accent" id="liveOdds">0.000</div>
-      </div>
-      <div class="live-chip">
-        <div class="live-chip-label">Potensi</div>
-        <div class="live-chip-value" id="livePayout">0.00</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="notice">
-    <div class="notice-icon">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-        <line x1="12" y1="9" x2="12" y2="13"/>
-        <line x1="12" y1="17" x2="12.01" y2="17"/>
-      </svg>
-    </div>
-    <div class="notice-body">
-      <div class="notice-title">Perhatian</div>
-      <div class="notice-text">
-        Hasil perhitungan dapat berbeda bergantung pada jenis situs yang digunakan. Mohon isi data secara manual agar hasil yang diperoleh lebih akurat.
+      <div class="notice-body">
+        <div class="notice-title">Perhatian</div>
+        <div class="notice-text">
+          Hasil perhitungan dapat berbeda bergantung pada jenis situs yang digunakan. Mohon isi data secara manual agar hasil yang diperoleh lebih akurat.
+        </div>
       </div>
     </div>
-  </div>
 
-  <div class="body-content">
+    <div class="body-content">
 
-    <div class="section no-underline" style="margin-top: 22px;">
-      <label>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6a2 2 0 0 1 2 2v2h2a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h2V4a2 2 0 0 1 2-2z"/><path d="M9 12h6M9 16h6"/></svg>
-        Paste Teks Bill Parlay
-      </label>
-      <textarea id="pasteText" placeholder="Paste teks bill lu di sini... Contoh:&#10;&#10;1&#10;JAPAN EMPEROR CUP&#10;FC Machida Zelvia vs Tochigi City FC&#10;Type : Over/Under  Odds: 1.64&#10;Bet : FC Machida Zelvia Win&#10;@ 1.640&#10;&#10;Bet Amount : 322.00&#10;Odds : 5.912&#10;Est. /Payout: 1,903.66"></textarea>
-      <button type="button" class="btn-primary" onclick="applyPaste()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-        Parse &amp; Terapkan
+      <div class="section no-underline" style="margin-top: 22px;">
+        <label>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6a2 2 0 0 1 2 2v2h2a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h2V4a2 2 0 0 1 2-2z"/><path d="M9 12h6M9 16h6"/></svg>
+          Paste Teks Bill Parlay
+        </label>
+        <textarea id="pasteText" placeholder="Paste teks bill lu di sini... Contoh:&#10;&#10;1&#10;JAPAN EMPEROR CUP&#10;FC Machida Zelvia vs Tochigi City FC&#10;Type : Over/Under  Odds: 1.64&#10;Bet : FC Machida Zelvia Win&#10;@ 1.640&#10;&#10;Bet Amount : 322.00&#10;Odds : 5.912&#10;Est. /Payout: 1,903.66"></textarea>
+        <button type="button" class="btn-primary" onclick="applyPaste()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Parse &amp; Terapkan
+        </button>
+        <div id="ocrStatus" class="ocr-status"></div>
+        <div class="paste-hint">
+          💡 Copy teks bill dari chat/catatan. Parser bakal cari odds + status (W / WH / D / LH / L) + stake + saldo.
+        </div>
+      </div>
+
+      <!-- 🆕 ORNAMENTAL DIVIDER -->
+      <div class="ornament"><span class="diamond"></span></div>
+
+      <div class="input-grid section">
+        <div>
+          <label for="saldoAwal">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/></svg>
+            Saldo Awal
+          </label>
+          <input type="number" id="saldoAwal" value="50" min="0" step="any">
+        </div>
+        <div>
+          <label for="stake">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            Nilai Taruhan
+          </label>
+          <input type="number" id="stake" value="50" min="0" step="any">
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="legs-header">
+          <label style="margin-bottom: 0;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+            Daftar Pilihan
+          </label>
+          <span class="count" id="legCount">2 LEG</span>
+        </div>
+        <div id="legs"></div>
+        <button type="button" class="btn-secondary" onclick="addLeg()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Tambah Pilihan
+        </button>
+      </div>
+
+      <button type="button" class="btn-primary" onclick="calculate()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Hitung Hasil
       </button>
-      <div id="ocrStatus" class="ocr-status"></div>
-      <div class="paste-hint">
-        💡 Copy teks bill dari chat/catatan. Parser bakal cari odds + status (W / WH / D / LH / L) + stake + saldo.
+
+      <div id="result" class="result">Hasil perhitungan bakal muncul di sini.</div>
+
+      <div class="hint">
+        <b>Panduan Singkat</b><br>
+        • <b>W</b> — menang penuh, odds tidak berubah<br>
+        • <b>WH</b> — menang separuh, nilai odds jadi <code>(odds − 1) ÷ 2 + 1</code><br>
+        • <b>D</b> — seri, odds dianggap <code>1</code><br>
+        • <b>LH</b> — kalah separuh, odds dianggap <code>0.5</code><br>
+        • <b>L</b> — kalah penuh, seluruh kombinasi dianggap gugur<br><br>
+        <b>Rumus Mix Parlay</b><br>
+        <code>(Total Odds × Nilai Taruhan) − Nilai Taruhan</code><br>
+        <b>Saldo Efektif</b> = Saldo Awal − Taruhan + Nilai Kembali<br><br>
+        <b>Shortcut</b><br>
+        Tekan <span class="kbd-hint">Ctrl</span> + <span class="kbd-hint">Enter</span> buat hitung cepat
       </div>
+
     </div>
-
-    <div class="input-grid section">
-      <div>
-        <label for="saldoAwal">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/></svg>
-          Saldo Awal
-        </label>
-        <input type="number" id="saldoAwal" value="50" min="0" step="any">
-      </div>
-      <div>
-        <label for="stake">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-          Nilai Taruhan
-        </label>
-        <input type="number" id="stake" value="50" min="0" step="any">
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="legs-header">
-        <label style="margin-bottom: 0;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-          Daftar Pilihan
-        </label>
-        <span class="count" id="legCount">2 LEG</span>
-      </div>
-      <div id="legs"></div>
-      <button type="button" class="btn-secondary" onclick="addLeg()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Tambah Pilihan
-      </button>
-    </div>
-
-    <button type="button" class="btn-primary" onclick="calculate()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-      Hitung Hasil
-    </button>
-
-    <div id="result" class="result">Hasil perhitungan bakal muncul di sini.</div>
-
-    <div class="hint">
-      <b>Panduan Singkat</b><br>
-      • <b>W</b> — menang penuh, odds tidak berubah<br>
-      • <b>WH</b> — menang separuh, nilai odds jadi <code>(odds − 1) ÷ 2 + 1</code><br>
-      • <b>D</b> — seri, odds dianggap <code>1</code><br>
-      • <b>LH</b> — kalah separuh, odds dianggap <code>0.5</code><br>
-      • <b>L</b> — kalah penuh, seluruh kombinasi dianggap gugur<br><br>
-      <b>Rumus Mix Parlay</b><br>
-      <code>(Total Odds × Nilai Taruhan) − Nilai Taruhan</code><br>
-      <b>Saldo Efektif</b> = Saldo Awal − Taruhan + Nilai Kembali<br><br>
-      <b>Shortcut</b><br>
-      Tekan <span class="kbd-hint">Ctrl</span> + <span class="kbd-hint">Enter</span> buat hitung cepat
-    </div>
-
   </div>
 </div>
 
@@ -1259,7 +1455,66 @@
   const ocrStatus = document.getElementById('ocrStatus');
   const legsContainer = document.getElementById('legs');
   const legCount = document.getElementById('legCount');
+  const moodRing = document.getElementById('moodRing');
 
+  /* ============================================================
+     🆕 BOKEH GENERATOR
+  ============================================================ */
+  (function() {
+    const container = document.getElementById('bokeh');
+    const colors = [
+      'rgba(212, 175, 55, 0.6)',
+      'rgba(16, 185, 129, 0.5)',
+      'rgba(6, 182, 212, 0.5)',
+      'rgba(139, 92, 246, 0.4)',
+      'rgba(232, 194, 82, 0.55)'
+    ];
+    for (let i = 0; i < 12; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'b';
+      const size = 20 + Math.random() * 60;
+      dot.style.width = size + 'px';
+      dot.style.height = size + 'px';
+      dot.style.left = Math.random() * 100 + '%';
+      dot.style.top = (Math.random() * 100) + '%';
+      dot.style.background = colors[Math.floor(Math.random() * colors.length)];
+      dot.style.animationDuration = (12 + Math.random() * 14) + 's';
+      dot.style.animationDelay = (-Math.random() * 20) + 's';
+      container.appendChild(dot);
+    }
+  })();
+
+  /* ============================================================
+     🆕 CURSOR SPOTLIGHT + HOLOGRAPHIC FOIL
+  ============================================================ */
+  (function() {
+    const glow = document.getElementById('cursorGlow');
+    const logo = document.getElementById('logo');
+    if (window.matchMedia('(pointer: coarse)').matches) return;
+
+    document.addEventListener('mousemove', (e) => {
+      glow.style.left = e.clientX + 'px';
+      glow.style.top = e.clientY + 'px';
+      glow.classList.add('on');
+
+      // Holographic foil follow mouse on logo
+      if (logo) {
+        const r = logo.getBoundingClientRect();
+        const x = ((e.clientX - r.left) / r.width * 100).toFixed(1) + '%';
+        const y = ((e.clientY - r.top) / r.height * 100).toFixed(1) + '%';
+        logo.style.setProperty('--mx', x);
+        logo.style.setProperty('--my', y);
+      }
+    });
+
+    document.addEventListener('mouseleave', () => {
+      glow.classList.remove('on');
+    });
+  })();
+
+  /* ============================================================
+     TOAST + ANTI-COPY
+  ============================================================ */
   let toastTimer;
   function showToast(msg) {
     const t = document.getElementById('toast');
@@ -1304,6 +1559,9 @@
     document.addEventListener('selectstart', (e) => { if (!isAllowed(e.target)) e.preventDefault(); });
   })();
 
+  /* ============================================================
+     PARTICLE NETWORK
+  ============================================================ */
   (function() {
     const canvas = document.getElementById('particles');
     if (!canvas) return;
@@ -1386,6 +1644,7 @@
     ocrStatus.className = 'ocr-status show ' + type;
   }
 
+  /* PARSER */
   function parseBill(text) {
     const rawLines = text
       .replace(/\r/g, '')
@@ -1614,12 +1873,14 @@
     const stake = parseFloat(document.getElementById('stake').value) || 0;
     let totalOdds = 1;
     let anyLose = false;
+    let hasNonW = false;
 
     legEls.forEach(el => {
       const odds = parseFloat(el.querySelector('.odds').value);
       const type = el.querySelector('.result-type').value;
       if (isNaN(odds) || odds < 1) return;
       if (type === 'L') { anyLose = true; return; }
+      if (type !== 'W') hasNonW = true;
       totalOdds *= convertOdds(odds, type);
     });
 
@@ -1628,6 +1889,13 @@
     document.getElementById('liveOdds').textContent = rounded.toFixed(3);
     const payout = anyLose ? 0 : stake * rounded;
     document.getElementById('livePayout').textContent = formatNum(payout);
+
+    /* 🆕 MOOD RING update */
+    if (moodRing) {
+      if (anyLose) moodRing.className = 'mood-ring danger';
+      else if (hasNonW) moodRing.className = 'mood-ring warn';
+      else moodRing.className = 'mood-ring';
+    }
   }
 
   document.getElementById('stake').addEventListener('input', updateLiveStats);
@@ -1688,9 +1956,9 @@
         <div class="result-hero">
           <div>
             <div class="result-hero-label">Hasil</div>
-            <div class="result-hero-value" style="background: linear-gradient(90deg, #fca5a5, #f85149); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">KALAH</div>
+            <div class="result-hero-value" style="background: linear-gradient(90deg, #fca5a5, #f85149); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 1px 0 rgba(255,255,255,0.08)) drop-shadow(0 -1px 1px rgba(0,0,0,0.7)) drop-shadow(0 0 22px rgba(248,81,73,0.45));">KALAH</div>
           </div>
-          <div class="result-hero-icon" style="background: linear-gradient(135deg, rgba(248,81,73,0.12), rgba(248,81,73,0.04)); border-color: rgba(248,81,73,0.3); box-shadow: 0 0 28px rgba(248,81,73,0.2);">
+          <div class="result-hero-icon" style="background: linear-gradient(135deg, rgba(248,81,73,0.14), rgba(248,81,73,0.04)); border-color: rgba(248,81,73,0.32); box-shadow: 0 0 28px rgba(248,81,73,0.22), inset 0 1px 0 rgba(255,255,255,0.08);">
             <svg viewBox="0 0 24 24" fill="none" stroke="#f85149" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </div>
         </div>
