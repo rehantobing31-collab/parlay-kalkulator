@@ -38,8 +38,9 @@
     --info: #6ea8ff;
     --info-soft: rgba(110, 168, 255, 0.12);
   }
-  html, body { height: 100%; }
+  html { height: 100%; scroll-behavior: smooth; }
   body {
+    height: 100%;
     font-family: 'Inter', -apple-system, sans-serif;
     background: var(--bg);
     color: var(--text);
@@ -64,7 +65,6 @@
   ::-moz-selection { background: rgba(79, 195, 232, 0.35); color: #eef4fa; }
   .result ::selection, .hint ::selection { background: rgba(136, 221, 255, 0.5); color: #0a0e14; }
 
-  /* SKY */
   .sky {
     position: fixed; inset: 0; z-index: -12;
     background:
@@ -87,7 +87,6 @@
     0% { background-position: 0 0, 0 0; }
     100% { background-position: 80px 80px, 80px 80px; }
   }
-  /* 🌐 BEZIER MESH CANVAS */
   #mesh {
     position: fixed;
     inset: 0;
@@ -157,21 +156,19 @@
   }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-  /* CARD WRAP */
+  /* ✅ CARD WRAP — FLUID FULL WIDTH */
   .card-wrap {
     position: relative;
     width: 100%;
-    max-width: 720px;
+    max-width: min(calc(100vw - 48px), 1300px);
     z-index: 1;
     animation: fadeUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both;
     transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
-  @media (min-width: 900px) { .card-wrap { max-width: 900px; } }
   @media (min-width: 1200px) {
-    .card-wrap { max-width: 1100px; }
+    .card-wrap { max-width: min(calc(100vw - 96px), 1300px); }
     body { padding: 40px 32px; }
   }
-  @media (min-width: 1600px) { .card-wrap { max-width: 1280px; } }
   body.zoom-focus .card-wrap { transform: scale(1.015); }
 
   /* AURA */
@@ -249,6 +246,23 @@
     content: ''; position: absolute; bottom: 0; left: 25%; right: 25%; height: 1px;
     background: linear-gradient(90deg, transparent 0%, rgba(79, 195, 232, 0.4) 50%, transparent 100%);
     z-index: 8; pointer-events: none;
+  }
+  /* ✅ TOP LIGHT AMBIENT */
+  .card > .top-light {
+    position: absolute;
+    top: 0; left: 20%; right: 20%;
+    height: 180px;
+    background: radial-gradient(ellipse at 50% 0%,
+      rgba(136, 221, 255, 0.08) 0%,
+      rgba(79, 195, 232, 0.03) 40%,
+      transparent 70%);
+    pointer-events: none;
+    z-index: 2;
+    animation: topLightBreath 6s ease-in-out infinite;
+  }
+  @keyframes topLightBreath {
+    0%, 100% { opacity: 0.6; transform: scaleY(1); }
+    50% { opacity: 1; transform: scaleY(1.1); }
   }
   .card .corner { position: absolute; width: 20px; height: 20px; pointer-events: none; z-index: 9; opacity: 0.65; }
   .card .corner::before, .card .corner::after { content: ''; position: absolute; background: var(--cyan-bright); box-shadow: 0 0 8px rgba(136, 221, 255, 0.9); }
@@ -474,7 +488,8 @@
   }
 
   .body-content { padding: 30px 38px 38px; }
-  @media (min-width: 1200px) { .body-content { padding: 36px 48px 44px; } }
+  @media (min-width: 1200px) { .body-content { padding: 40px 56px 52px; } }
+  @media (min-width: 1600px) { .body-content { padding: 48px 72px 60px; } }
   label {
     display: flex; align-items: center; gap: 8px;
     font-size: 12px; font-weight: 600; color: var(--text-dim);
@@ -951,6 +966,7 @@
   </div>
 
   <div class="card" id="card">
+    <div class="top-light"></div>
     <div class="corner tl"></div>
     <div class="corner tr"></div>
     <div class="corner bl"></div>
@@ -1109,9 +1125,7 @@
   const moodRing = document.getElementById('moodRing');
   const soundToggle = document.getElementById('soundToggle');
 
-  /* ============================================================
-     🌐 BEZIER MESH BACKGROUND — animated curved network
-  ============================================================ */
+  /* BEZIER MESH */
   (function bezierMesh() {
     const canvas = document.getElementById('mesh');
     if (!canvas) return;
@@ -1122,7 +1136,6 @@
     let mouse = { x: -10000, y: -10000, active: false };
     let time = 0;
 
-    // ===== PRODUCTION CONFIG =====
     const CFG = {
       nodeCount: 90,
       linkDist: 165,
@@ -1180,7 +1193,6 @@
       const mouseRadius = CFG.mouseRadius * DPR;
       const linkDistSq = linkDist * linkDist;
 
-      // Update
       for (const n of nodes) {
         if (mouse.active) {
           const dx = mouse.x - n.x;
@@ -1220,7 +1232,6 @@
         n.pulsePhase += n.pulseSpeed;
       }
 
-      // Build links
       const links = [];
       for (let i = 0; i < nodes.length; i++) {
         let count = 0;
@@ -1236,7 +1247,6 @@
         }
       }
 
-      // Draw BEZIER links
       for (const { i, j, dSq } of links) {
         const d = Math.sqrt(dSq);
         const prox = 1 - d / linkDist;
@@ -1246,7 +1256,6 @@
         const n2 = nodes[j];
         const lc = CFG.lineColors[(i + j) % CFG.lineColors.length];
 
-        // Gradient flow
         const grad = ctx.createLinearGradient(n1.x, n1.y, n2.x, n2.y);
         const flow = (Math.sin(time * 0.03 + i * 0.5 + j * 0.3) + 1) / 2;
         const e1 = Math.max(0.3, n1.energy);
@@ -1255,7 +1264,6 @@
         grad.addColorStop(Math.min(0.99, flow), `rgba(255, 255, 255, ${alpha * 0.7 * prox})`);
         grad.addColorStop(1, `rgba(${lc[0]}, ${lc[1]}, ${lc[2]}, ${alpha * e2})`);
 
-        // === BEZIER CURVE ===
         const mx = (n1.x + n2.x) / 2;
         const my = (n1.y + n2.y) / 2;
         const nx = -(n2.y - n1.y);
@@ -1273,7 +1281,6 @@
         ctx.stroke();
       }
 
-      // Draw nodes
       for (const n of nodes) {
         const pulse = 0.75 + Math.sin(n.pulsePhase) * 0.35;
         const r = n.r * pulse;
@@ -1303,7 +1310,6 @@
         }
       }
 
-      // Mouse glow
       if (mouse.active) {
         const grad = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, mouseRadius * 0.7);
         grad.addColorStop(0, 'rgba(136, 221, 255, 0.1)');
